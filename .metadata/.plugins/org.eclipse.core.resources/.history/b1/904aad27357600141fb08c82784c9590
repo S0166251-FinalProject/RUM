@@ -1,0 +1,108 @@
+import inspect
+import types
+import functools
+from rum.RUM import *  
+import sys
+
+class Interjector(object):
+    
+    wrappers = []
+    
+    def __init__(self):
+        return    
+
+    def InterjectOptimizerBetweenComponentAndMethod(self, callingClass, calledComponent, calledMethod, optimizer):
+        calledMethodName = calledMethod.__name__
+        if not Interjector.__alreadyWrapped__(calledComponent, calledMethodName):      
+            if isinstance(calledMethod, types.FunctionType):
+                wrapper = Interjector.__createStaticWrapper__(calledComponent, calledMethodName, calledMethod, optimizer)   
+                setattr(calledComponent, calledMethodName, wrapper)
+            else:                          
+                wrapper = Interjector.__createWrapper__(calledComponent, calledMethodName, calledMethod, optimizer)
+                setattr(calledComponent, calledMethodName, types.MethodType(wrapper, self))   
+        wrapperTuple = (callingClass, calledComponent, calledMethodName, optimizer)
+        if wrapperTuple not in Interjector.wrappers:
+            Interjector.wrappers.append(wrapperTuple)
+            
+        
+    def InterjectOptimizerBetweenComponents(self, highComponent, lowComponent, optimizer = None):
+        if optimizer == None:
+            optimizer = self
+            
+        targets = dir(lowComponent)
+        callables = []
+        for t in targets:
+            if inspect.ismethod(getattr(lowComponent, t)) and not t == '__init__':
+                callables.append(t)
+        for calledMethodName in callables:
+            if not Interjector.__alreadyWrapped__(lowComponent, calledMethodName):
+                method = getattr(lowComponent, calledMethodName)
+                wrapper = Interjector.__createWrapper__(lowComponent, calledMethodName, method, optimizer)
+                setattr(lowComponent, calledMethodName, types.MethodType(wrapper, self))
+            wrapperTuple = (highComponent, lowComponent, calledMethodName, optimizer)
+            if wrapperTuple not in Interjector.wrappers:
+                Interjector.wrappers.append(wrapperTuple)
+                
+    def UndoInterjectionBetweenComponents(self, highComponent, lowComponent):        
+        tempWrappers = []
+        for wrap in Interjector.wrappers:
+            if not (wrap[0] == highComponent and wrap[1] == lowComponent):
+                tempWrappers.append(wrap)
+        Interjector.wrappers = tempWrappers
+        
+    def UndoInterjectionBetweenComponentAndMethod(self, highComponent, lowComponent, calledMethod):
+        tempWrappers = []
+        for wrap in Interjector.wrappers:
+            if not (wrap[0] == highComponent and wrap[1] == lowComponent and wrap[2] == calledMethod.__name__):
+                tempWrappers.append(wrap)
+        Interjector.wrappers = tempWrappers
+                
+    @staticmethod
+    def __alreadyWrapped__(component, method):
+        for t in Interjector.wrappers:
+            if t[1] == component and t[2] == method:
+                return True
+        return False        
+    
+    @staticmethod
+    def __createWrapper__(calledComponent, calledMethodName, calledMethod, optimizer):            
+        def wrapper(self, *args, **kwargs):
+            n = 10000
+            t0 = time.clock()
+            for x in range(n): self.component.setA()
+            t1 = time.clock()
+            print((t1-t0)/n)
+            
+            doRedirect = Interjector.__shouldRedirect__(sys._getframe(), calledComponent, calledMethodName, optimizer)
+            if doRedirect:
+                return getattr(optimizer, calledMethodName)(*args, **kwargs)   
+            else:
+                return calledMethod(*args, **kwargs)   
+        wrapper.__name__ = calledMethodName         
+        return wrapper     
+    
+    @staticmethod
+    def __createStaticWrapper__(calledComponent, calledMethodName, calledMethod, optimizer):            
+        def wrapper(*args, **kwargs):
+            doRedirect = Interjector.__shouldRedirect__(sys._getframe(), calledComponent, calledMethodName, optimizer)
+            if doRedirect:
+                return getattr(optimizer, calledMethodName)(*args, **kwargs)   
+            else:
+                return calledMethod(*args, **kwargs)   
+        wrapper.__name__ = calledMethodName         
+        return wrapper   
+    
+    @staticmethod
+    def __shouldRedirect__(currentframe, calledComponent, calledMethodName, optimizer):  
+        interceptor = Interceptor.__module__
+        
+        if len(currentframe.f_back.f_code.co_varnames) > 0:
+            self_argument = currentframe.f_back.f_code.co_varnames[0]
+            caller = currentframe.f_back.f_locals[self_argument]
+            '''go through all wrapper entries, check if there is a match'''
+            for t in Interjector.wrappers:   
+                if t[0] == caller and t[1] == calledComponent and t[2] == calledMethodName and t[3] == optimizer:
+                    return True
+            if inspect.getmodule(currentframe.f_back.f_code).__name__ == interceptor:
+                return Interjector.__shouldRedirect__(currentframe.f_back) 
+        return False   

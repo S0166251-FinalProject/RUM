@@ -1,0 +1,124 @@
+from rum.Guards.AbstractGuard import AbstractGuard
+
+'''---TypedGuards---'''
+''' example of type checking in guards to ensure correctness, hasn't been updated with the rest of the library '''
+class TypedGuard(AbstractGuard):
+
+    def __init__(self, operator, leftOperand, rightOperand):
+        AbstractGuard.__init__(self, operator, leftOperand, rightOperand)
+        
+    def getReturnType(self):
+        return self.operator.getReturnType()
+        
+    def evaluate(self, beforeVariables, afterVariables, component, method):    
+        if self.compatibleOperandTypes():
+            left = self.getValue(self.leftOperand, beforeVariables, afterVariables, component, method)
+            right = self.getValue(self.rightOperand, beforeVariables, afterVariables, component, method)        
+            return self.operator.execute(left, right) 
+        else:
+            raise Exception('operand types not compatible with the given operator')       
+    
+    def compatibleOperandTypes(self):
+        leftType = self.getOperandType(self.leftOperand)
+        rightType = self.getOperandType(self.rightOperand)        
+        if leftType == rightType:
+            return self.operator.canProcessType(leftType)
+        else:
+            raise Exception('incompatible operand types encountered')
+    
+    def getOperandType(self, operand):    
+        if isinstance(operand, bool):
+            return bool
+        elif isinstance(operand, Number) or self.isNumber(type(operand)):
+            return Number
+        elif isinstance(operand, Guard):
+            opType = operand.getReturnType()
+            if isinstance(opType, bool):
+                return bool
+            elif self.isNumber(opType):
+                return Number
+            else:
+                return opType
+        elif isinstance(operand, Operand):
+            opType = operand.getType()
+            if isinstance(opType, bool):
+                return bool
+            elif self.isNumber(opType):
+                return Number
+            else:
+                return opType
+        else:
+            raise Exception('unknown operand type encountered. An operand must be inherit from one of the following classes: Number, bool or GuardOperand')
+    
+    def getValue(self, operand, beforeVariables, afterVariables, component, method):
+        if isinstance(operand, Number) or isinstance(operand, bool) or self.isNumber(type(operand)):
+            return operand
+        elif isinstance(operand, Guard):
+            return operand.evaluate(beforeVariables, afterVariables, component, method)
+        elif isinstance(operand, Operand):
+            return operand.getValue(beforeVariables, afterVariables, component, method)
+        else:
+            raise Exception('unknown operand type encountered. An operand must be inherit from one of the following classes: Number, bool, Guard or GuardOperand')
+  
+    def isNumber(self, opType):
+        return opType == int or opType == float or opType == complex   
+    
+'''-----TypedOperators-----'''
+        
+class TypedOperator(BinaryOperator): 
+    
+    def __init__(self, operator, returnType, processableTypes):
+        BinaryOperator.__init__(self, operator)
+        self.returnType = returnType
+        self.canProcess = processableTypes
+    
+    def canProcessType(self, givenType):
+        return givenType in self.canProcess
+    
+    def getReturnType(self):
+        return self.returnType
+    
+class TypedEqualsOperator(BinaryOperator):
+    
+    def __init__(self):
+        BinaryOperator.__init__(self, operator.eq, bool, [bool, Number])
+        
+'''-----TypedOperands-----'''
+   
+class TypedOperand(Operand):
+    
+    def getType(self):
+        raise NotImplementedError('Classes which inherit from rum.Guards.TypedOperand must implement getType(self)')
+   
+class TypedFunctionValueOperand(TypedOperand):
+        
+    def __init__(self, component, function, *params):
+        Operand.__init__(self)
+        self.function = function
+        self.component = component
+        self.params = params
+        
+    def getValue(self, variables, component, method):        
+        return getattr(self.component, self.function)(self.params)
+        
+    def getType(self):
+        return type(getattr(self.component, self.function)(self.params))
+    
+class TypedFieldVariableOperand(TypedOperand):
+    
+    def __init__(self, component, field):
+        Operand.__init__(self)
+        self.field = field
+        self.component = component
+        
+    def getValue(self, variables, component, method):
+        '''return the value of the given field, as it was recorded by the interceptor
+        if the interceptor did not record the field value, then it must belong to another class,
+        in this case, retrieve it directly using getattr'''
+        if self.field in variables:
+            return variables[self.field]
+        else:
+            return getattr(self.component, self.field)
+        
+    def getType(self):
+        return type(getattr(self.component, self.field))

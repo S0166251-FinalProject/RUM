@@ -1,0 +1,175 @@
+
+class RoutePlanner(object):
+
+    def __init__(self, world, currentLocation):
+        self.world = world
+        self.currentLocation = currentLocation
+        self.route = []
+        
+    def setCurrentLocation(self, location): 
+        '''TODO: catch index error'''
+        if len(self.route) == 0 or self.route[0][0] != location:
+            self.route = []
+        else:
+            self.route.pop(0)        
+        self.currentLocation = location 
+        print("now at: "+location.__repr__()) 
+        
+    def getCurrentLocation(self):
+        return self.currentLocation     
+        
+    def determineFastestRouteTo(self, destination):     
+        return self.determineFastestRouteFromTo(self.currentLocation, destination)
+    
+    def determineFastestRouteFromTo(self, location, destination):        
+        '''first get all possible routes from currentLocation to destination'''       
+        paths = self.__getRoutesFromTo(location, destination)  
+        '''return format is a list of tuples with location,road'''
+        return self.__getFastestRoute(paths)  
+        
+        
+    def determineCheapestRouteTo(self, destination):
+        paths = self.__getRoutesFromTo(self.currentLocation, destination)  
+        return self.__getShortestRoute(paths)     
+    
+    def __getRoutesFromTo(self, location, destination):
+        paths = []
+        if location is destination:
+            return paths        
+        roads = self.world.getAvailableRoadsAt(location)
+        for road in roads:
+            path = [road]
+            temp = self.__getRoutesFromToHelper(road[0], destination, path)
+            if any(isinstance(el, list) for el in temp):                    
+                for p in temp:
+                    if len(p) > 0:
+                        paths.append(p)
+            elif len(temp) > 0:
+                paths.append(temp)      
+        return paths          
+        
+    def __getRoutesFromToHelper(self, location, destination, path):
+        paths = []
+        if location is destination:
+            return path
+        
+        roads = self.world.getAvailableRoadsAt(location)
+        for road in roads:
+            if not self.__alreadyVisited(road[0], path):                
+                tempPath = list(path)
+                tempPath.append(road)
+                tempPaths = self.__getRoutesFromToHelper(road[0], destination, tempPath)
+                if any(isinstance(el, list) for el in tempPaths):                    
+                    for p in tempPaths:
+                        paths.append(p)
+                else:
+                    paths.append(tempPaths)
+        return paths
+    
+    def __alreadyVisited(self, location, path):
+        notVisited = True
+        for con in path:
+            notVisited &= con[0] != location and location != self.currentLocation
+        return not notVisited
+    
+    def atDestination(self):
+        return len(self.route) ==0     
+    
+    def getNextStop(self):
+        if not self.atDestination():
+            return self.route[0][0]   
+        
+    def __getFastestRoute(self, paths):
+        path = []
+        time = -1
+        for p in paths:
+            t = 0
+            for loc in p:
+                road = loc[1]
+                t += road.getDistance()/road.getMaxSpeed()
+                
+            if time == -1 or t < time:
+                time = t
+                path = p
+        
+        return path
+    
+    def __getShortestRoute(self, paths):
+        path = []
+        distance = 0
+        for p in paths:
+            d = 0
+            for loc in p:
+                road = loc[1]
+                d += road.getDistance()                
+            if d > distance:
+                distance = d
+                path = p        
+        return path
+        
+        
+    def setRoute(self, route):
+        self.route = route  
+    
+    def getMaxAllowedSpeed(self):
+        if len(self.route) >0:
+            return self.route[0][1].getMaxSpeed()
+        else:
+            return 0
+        
+    def getWorld(self):
+        return self.world
+    
+    def setPackageManager(self, manager):
+        self.packageManager = manager
+        
+    def allPackagesAreDelivered(self):
+        if self.packageManager != None:
+            return self.packageManager.allPackagesAreDelivered()
+        else:
+            return True
+        
+    def getNearestUndeliveredPackage(self):
+        if self.packageManager != None:
+            undeliveredPackages = self.packageManager.getUndeliveredPackages()
+            packAndDistance = []
+            for package in undeliveredPackages:
+                paths = self.__getRoutesFromTo(self.currentLocation, package.getCurrentLocation())  
+                packAndDistance.append((package, self.__getShortestRoute__(paths)))                
+            
+            return self.getNearestPackage(packAndDistance)
+            
+        else:
+            return None
+        
+    def __getShortestRoute__(self, paths):   
+        distance = -1
+        for p in paths:
+            d = 0
+            for loc in p:
+                road = loc[1]
+                d += road.getDistance()
+                
+            if distance == -1 or d < distance:
+                distance = d
+                    
+        return distance
+        
+    def getNearestPackage(self, packAndDistance):
+        package = None
+        distance = -1
+        for pAndD in packAndDistance:   
+            if distance == -1 or pAndD[1] < distance:
+                distance = pAndD[1]
+                package = pAndD[0]
+        return package
+    
+    def getFastRouteToPickupPackage(self, package):
+        destination = package.getCurrentLocation().getLocation()
+        return self.determineFastestRouteTo(destination)
+
+    def getFastRouteToDeliverPackage(self, package):
+        destination = package.getDestination().getLocation()
+        return self.determineFastestRouteTo(destination)        
+        
+    

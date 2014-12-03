@@ -1,0 +1,270 @@
+from test.BaseTest import BaseTest
+from rum.RUM import RUM
+from rum.statemachine.States import State
+from rum.statemachine.Guards import *
+from rum.statemachine.Operators import *
+from rum.statemachine.Query import *
+
+class QueryTest(BaseTest):
+    
+    def __init__(self, name, expected):
+        BaseTest.__init__(self, name, expected)
+
+    def visitQueryResult(self, query):
+        if isinstance(query, CompositeQueryResult):
+            return self.visitCompositeQueryResult()
+        elif isinstance(query, InvokeServiceQueryResult):
+            return self.visitInvokeServiceQueryResult()
+        else:    
+            action = query.getAction()
+            value = query.getValue()
+            field = query.getField()[1]
+            if query.inverted:
+                return "!("+field.__repr__()+action.__repr__()+value.__repr__()+")"
+            return field.__repr__()+action.__repr__()+value.__repr__()
+    
+    def visitCompositeQueryResult(self, query):
+        if isinstance(query, AndQueryResult):
+            return self.visitAndQueryResult()
+        elif isinstance(query, OrQueryResult):
+            return self.visitOrQueryResult()
+        return
+    
+    def visitAndQueryResult(self, query):
+        if query.inverted:
+            result = "!AND("
+        else:
+            result = "AND( "
+        for q in query.getQueryResults():
+            result += self.visitQueryResult(q)
+        result += ')'
+        return result
+    
+    def visitOrQueryResult(self, query):
+        if query.inverted:
+            result = "!OR("
+        else:
+            result = "OR( "
+        for q in query.getQueryResults():
+            result += self.visitQueryResult(q)
+        result += ')'
+        return result
+    
+    def visitInvokeServiceQueryResult(self, query):
+        if query.inverted:
+            return "!(invoke "+query.service+")"
+        return "invoke "+query.service
+
+class QueryEqualsTest(QueryTest):
+
+    def __init__(self):
+        QueryTest.__init__(self, "QueryEqualsTest", "'x''inc'2")
+        self.component = Component(3, 5)
+        self.rum = TestRUM(self.component)
+             
+    def execute(self):           
+        result = self.rum.query(self.rum, 'B')
+        result = result[0][0]
+        result = self.visitQueryResult(result)
+        '''result = field.__repr__()+action.__repr__()+value.__repr__()'''
+        BaseTest.execute(self, result)
+        
+class QueryGreaterThanTest(QueryTest):
+
+    def __init__(self):
+        QueryTest.__init__(self, "QueryGreaterThanTest", "'x''inc'3")
+        self.component = Component(3, 5)
+        self.rum = TestRUM(self.component)
+             
+    def execute(self):
+        result = self.rum.query(self.rum, 'C')
+        result = result[0][0]
+        result = self.visitQueryResult(result)
+        BaseTest.execute(self, result)
+
+class QuerySmallerThanTest(QueryTest):
+
+    def __init__(self):
+        QueryTest.__init__(self, "QuerySmallerThanTest", "'x''dec'3")
+        self.component = Component(7, 5)
+        self.rum = TestRUM(self.component)
+             
+    def execute(self):
+        result = self.rum.query(self.rum, 'D')
+        result = result[0][0]
+        result = self.visitQueryResult(result)
+        BaseTest.execute(self, result)
+        
+class QueryAndTest(QueryTest):
+
+    def __init__(self):
+        QueryTest.__init__(self, "QueryAndTest", "OR: 'x''Set'False'y''Set'True")
+        self.component = Component(True, False)
+        self.rum = TestRUM(self.component)
+             
+    def execute(self):
+        result = self.rum.query(self.rum, 'E')
+        result = result[0][0]
+        results = result.getQueryResults()
+        if isinstance(result, OrQueryResult):
+            result = "OR: "
+        else:
+            result = ""
+        for r in results:
+            action = r.getAction()
+            value = r.getValue()
+            field = r.getField()[1]
+            result += field.__repr__()+action.__repr__()+value.__repr__()
+        BaseTest.execute(self, result)
+        
+class QueryNotEqualsTest(QueryTest):
+
+    def __init__(self):
+        QueryTest.__init__(self, "QueryNotEqualsTest","inverted:OR: AND: 'x'NoneTrue'y'NoneTrue")
+        self.component = Component(True, True)
+        self.rum = TestRUM(self.component)
+             
+    def execute(self):        
+        result = self.rum.query(self.rum, 'F')
+        res = result[0][0]             
+        result = ""
+        results = res.getQueryResults()
+        if res.inverted:
+                result +="inverted:"
+        if isinstance(res, OrQueryResult):
+            result += "OR: "
+        for r in results:
+            if r.inverted:
+                result +="inverted:"
+            if isinstance(r, AndQueryResult):
+                result += "AND: "
+            results = r.getQueryResults()
+            for inner in results:
+                action = inner.getAction()
+                value = inner.getValue()
+                field = inner.getField()[1]
+                result += field.__repr__()+action.__repr__()+value.__repr__()
+        BaseTest.execute(self, result)
+        
+class QueryOrResult(QueryTest):
+    
+    def __init__(self):
+        QueryTest.__init__(self, "QueryOrResult", "Inverted OR: 'x''Set'True'y''Set'False")
+        self.component = Component(False, True)
+        self.rum = TestRUM(self.component)
+             
+    def execute(self):
+        result = self.rum.query(self.rum, 'G')
+        res = result[0][0]             
+        result = ""
+        results = res.getQueryResults()
+        if res.inverted:
+                result +="inverted:"
+        if isinstance(res, OrQueryResult):
+            result += "OR: "
+        for r in results:
+            if r.inverted:
+                result +="inverted:"
+            if isinstance(r, AndQueryResult):
+                result += "AND: "
+            action = r.getAction()
+            value = r.getValue()
+            field = r.getField()[1]
+            result += field.__repr__()+action.__repr__()+value.__repr__()
+        BaseTest.execute(self, result)
+    
+class QueryCompositeResult(QueryTest):
+    
+    def __init__(self):
+        QueryTest.__init__(self, "QueryCompositeResult", "")
+        self.component = Component(3, 10)
+        self.rum = TestRUM(self.component)
+             
+    def execute(self):
+        result = self.rum.query(self.rum, 'H')
+        print(result)
+        res = result[0][0]             
+        result = ""
+        results = res.getQueryResults()    
+        if res.inverted:
+                result +="inverted:"
+        if isinstance(res, OrQueryResult):
+            result += "OR: "
+        for r in results:
+            if r.inverted:
+                result +="inverted:"
+            if isinstance(r, AndQueryResult):
+                result += "AND:( "
+            if isinstance(r, CompositeQueryResult):                
+                results = r.getQueryResults()
+                for inner in results:
+                    action = inner.getAction()
+                    value = inner.getValue()
+                    field = inner.getField()[1]
+                    result += field.__repr__()+action.__repr__()+value.__repr__()
+                result += ')'  
+            else:
+                action = inner.getAction()
+                value = inner.getValue()
+                field = inner.getField()[1]
+                result += '('+field.__repr__()+action.__repr__()+value.__repr__()+")"
+        BaseTest.execute(self, result)    
+
+
+class Component(object):
+    
+    def __init__(self, x, y):
+        self.y = y
+        self.x = x    
+        
+class TestRUM(RUM):  
+    def __init__(self, comp): 
+        self.comp = comp       
+        RUM.__init__(self, None, BasicRUMQuery())
+        
+    def __setupStates__(self):      
+        self.addState(StateA('A', self.comp))
+        self.addState(StateB('B', self.comp)) 
+        self.addState(StateB('C', self.comp)) 
+        self.addState(StateB('D', self.comp))
+        self.addState(StateB('E', self.comp)) 
+        self.addState(StateB('F', self.comp)) 
+        self.addState(StateB('G', self.comp))
+        self.addState(StateB('H', self.comp)) 
+        self.setInitialState('A')     
+        
+class StateA(State):
+    
+    def __init__(self, name, comp):
+        State.__init__(self,  name)
+        self.comp = comp
+        
+    def __setupStateTransitions__(self, states):      
+        guard = Guard(EqualsOperator(), FieldVariableOperand(self.comp, 'x'), 5)
+        self.addStateTransition(states['B'], guard)        
+        guard = Guard(GreaterThanOperator(), FieldVariableOperand(self.comp, 'x'), 5)
+        self.addStateTransition(states['C'], guard)        
+        guard = Guard(SmallerThanOperator(), FieldVariableOperand(self.comp, 'x'), 5)             
+        self.addStateTransition(states['D'], guard)        
+        guard = Guard(AndOperator(), FieldVariableOperand(self.comp, 'x'), FieldVariableOperand(self.comp, 'y'))             
+        self.addStateTransition(states['E'], guard)        
+        guard = Guard(NotEqualsOperator(), FieldVariableOperand(self.comp, 'x'), FieldVariableOperand(self.comp, 'y'))  
+        self.addStateTransition(states['F'], guard)        
+        guard = Guard(OrOperator(), FieldVariableOperand(self.comp, 'x'), FieldVariableOperand(self.comp, 'y'))   
+        self.addStateTransition(states['G'], guard)        
+        guard = Guard(AdditionOperator(), FieldVariableOperand(self.comp, 'x'), 4)    
+        guard = Guard(EqualsOperator(), guard, FieldVariableOperand(self.comp, 'y'))
+        self.addStateTransition(states['H'], guard)
+        
+class StateB(State):
+    def __init__(self, name, comp):
+        State.__init__(self,  name)
+        self.comp = comp
+        
+    def __setupStateTransitions__(self, states):
+        return
+    
+
+        
+        
+        

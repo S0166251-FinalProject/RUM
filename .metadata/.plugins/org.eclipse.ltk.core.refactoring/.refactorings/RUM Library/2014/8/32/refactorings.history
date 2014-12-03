@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;RUM Library/rum/StateMachine.py&apos; to &apos;States.py&apos;" description="Rename resource &apos;StateMachine.py&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="rum/StateMachine.py" name="States.py" stamp="1407499441489" updateReferences="true"/>
+</session>

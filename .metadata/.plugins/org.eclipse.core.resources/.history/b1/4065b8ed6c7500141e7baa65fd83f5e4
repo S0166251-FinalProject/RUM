@@ -1,0 +1,289 @@
+from test.BaseTest import BaseTest
+from rum.RUM import RUM
+from rum.statemachine.States import State
+from rum.statemachine.Guards import *
+from rum.statemachine.Operators import *
+from rum.Interjector import Interjector
+from test.interceptor.InterceptorTests import BasicTestTwoRUM
+import types
+import time
+
+class BasicInterjectionTest(BaseTest):
+    
+    def __init__(self):
+        BaseTest.__init__(self, "BasicInterjectionTest", "GFBAGBFA")
+        self.called = ComponentCalled()
+        self.caller = ComponentCaller(self.called)
+        self.optimizer = Optimizer(self.called)
+        self.rum = OptimizerRUM(self.caller, self.called, self.optimizer)
+        
+    def execute(self):
+                
+        n = 100000
+        t0 = time.clock()        
+        for i in range(n): self.caller.setB()
+        t1 = time.clock()
+        total = t1-t0
+        print(total/n)
+        
+        self.rum.connectOptimizer()
+        self.caller.setB()
+        result = self.called.x
+        self.caller.setA()
+        result += self.called.x
+        self.rum.disconnectOptimizer()
+        self.caller.setB()
+        result += self.called.x
+        self.caller.setA()
+        result += self.called.x
+        self.rum.connectOptimizer()
+        self.caller.setB()
+        result += self.called.x
+        self.rum.disconnectOptimizerOneMethod(self.called.setB)
+        self.caller.setB()
+        result += self.called.x
+        self.caller.setA()
+        result += self.called.x
+        self.rum.disconnectOptimizerOneMethod(self.called.setA)
+        self.caller.setA()
+        result += self.called.x        
+        BaseTest.execute(self, result)
+        self.rum.disconnectOptimizer()
+        
+        
+    
+class TwoInstancesInterjectionTest(BaseTest):
+    
+    def __init__(self):
+        BaseTest.__init__(self, "TwoInstancesInterjectionTest", "GFBA")
+        self.called = ComponentCalled()
+        self.caller = ComponentCaller(self.called)
+        self.otherCaller = ComponentCaller(self.called)
+        self.optimizer = Optimizer(self.called)
+        self.rum = OptimizerRUM(self.caller, self.called, self.optimizer)
+        
+    def execute(self):
+        self.rum.connectOptimizer()
+        self.caller.setB()
+        result = self.called.x
+        self.caller.setA()
+        result += self.called.x
+        self.otherCaller.setB()
+        result += self.called.x
+        self.otherCaller.setA() 
+        result += self.called.x       
+        BaseTest.execute(self, result)    
+        self.rum.disconnectOptimizer()
+
+class TwoInstancesInterjectionTestTwo(BaseTest):
+    
+    def __init__(self):
+        BaseTest.__init__(self, "TwoInstancesInterjectionTestTwo", "BFGA")
+        self.called = ComponentCalled()
+        self.caller = ComponentCaller(self.called)
+        self.otherCaller = ComponentCaller(self.called)
+        self.optimizer = Optimizer(self.called)        
+        self.rum = OptimizerRUM(self.caller, self.called, self.optimizer)
+        self.otherRum = OptimizerRUM(self.otherCaller, self.called, self.optimizer)
+        
+    def execute(self):
+        self.rum.connectOptimizerOneMethod(self.called.setA)
+        self.otherRum.connectOptimizerOneMethod(self.called.setB)
+        self.caller.setB()
+        result = self.called.x
+        self.caller.setA()
+        result += self.called.x
+        self.otherCaller.setB()
+        result += self.called.x
+        self.otherCaller.setA() 
+        result += self.called.x       
+        BaseTest.execute(self, result)
+        self.rum.disconnectOptimizer()        
+        self.otherRum.disconnectOptimizer()
+    
+ 
+class InterjectionInterceptorTest(BaseTest):
+    
+    def __init__(self):
+        BaseTest.__init__(self, "InterjectionInterceptorTest", "GFBA")
+        self.called = ComponentCalled()
+        self.caller = ComponentCaller(self.called)
+        self.optimizer = Optimizer(self.called)        
+        self.rum = OptimizerRUM(self.caller, self.called, self.optimizer)
+        self.compRUM = BasicTestTwoRUM(self.called)  
+        
+    def execute(self):
+        self.rum.connectOptimizer()
+        self.caller.setB()
+        result = self.called.x
+        self.caller.setA()
+        result += self.called.x   
+        self.rum.disconnectOptimizer()      
+        self.caller.setB()
+        result += self.called.x
+        self.caller.setA()
+        result += self.called.x   
+        BaseTest.execute(self, result)   
+    
+    
+  
+class InterjectionMethodReplacedTest(BaseTest):
+    
+    def __init__(self):
+        BaseTest.__init__(self, "InterjectionMethodReplacedTest", "GFZF")
+        self.called = ComponentCalled()
+        self.caller = ComponentCaller(self.called)
+        self.optimizer = Optimizer(self.called)        
+        self.rum = OptimizerRUM(self.caller, self.called, self.optimizer)
+        
+    def execute(self):
+        self.rum.connectOptimizer()
+        self.caller.setB()
+        result = self.called.x
+        self.caller.setA()
+        result += self.called.x   
+        
+        def replacement(self, *args, **kwargs):
+            self.x = 'Z'
+        
+        setattr(self.called, "setB", types.MethodType(replacement, self.called))
+        self.caller.setB()
+        result += self.called.x
+        self.caller.setA()
+        result += self.called.x   
+        BaseTest.execute(self, result)   
+        self.rum.disconnectOptimizer() 
+
+ 
+class InterjectionStaticCallerTest(BaseTest):
+    
+    def __init__(self):
+        BaseTest.__init__(self, "InterjectionStaticCallerTest", "CF")
+        self.called = ComponentCalled()
+        self.caller = ComponentCaller(self.called)
+        self.optimizer = Optimizer(self.called)        
+        self.rum = OptimizerRUM(self.caller, self.called, self.optimizer)
+        
+    def execute(self):
+        self.rum.connectOptimizer()
+        self.caller.setC(self.called)
+        result = self.called.x
+        self.caller.setA()
+        result += self.called.x         
+        BaseTest.execute(self, result)   
+        self.rum.disconnectOptimizer() 
+    
+  
+class InterjectionStaticCalledTest(BaseTest):
+    
+    def __init__(self):
+        BaseTest.__init__(self, "InterjectionStaticCalledTest", "AEE")
+        self.called = ComponentCalled()
+        self.caller = ComponentCaller(self.called)
+        self.optimizer = Optimizer(self.called)        
+        self.rum = OptimizerRUM(self.caller, self.called, self.optimizer)
+        
+    def execute(self):
+        self.rum.connectOptimizer()        
+        self.caller.setD()
+        result = self.called.x
+        self.caller.setE()
+        result += self.called.x        
+        self.rum.connectOptimizerOneMethod(self.called.setE)
+        self.caller.setE()
+        result += self.called.x 
+        BaseTest.execute(self, result)     
+        self.rum.disconnectOptimizer() 
+
+    
+class ComponentCaller(object):
+    
+    def __init__(self, other):
+        self.other = other
+        
+    def setA(self):
+        self.other.setA()
+        
+    def setB(self):
+        self.other.setB()
+        
+    @staticmethod
+    def setC(other):
+        other.setC()
+        
+    def setD(self):
+        ComponentCalled.setD()
+
+    def setE(self):
+        ComponentCalled.setE(self.other)    
+    
+class ComponentCalled(object):
+    
+    x = None
+    
+    def __init__(self):
+        self.x = 'A'
+        
+    def setA(self):
+        self.x = 'A'
+        
+    def setB(self):
+        self.x = 'B'
+        
+    def setC(self):
+        self.x = 'C'
+        
+    @staticmethod
+    def setD():
+        ComponentCalled.x = 'D'
+       
+    @staticmethod      
+    def setE(self):
+        self.x = 'E' 
+        
+        
+class Optimizer(object):       
+    
+    def __init__(self, component):
+        self.component = component
+        
+    def setA(self):
+        self.component.x = 'F'
+        
+    def setB(self):
+        self.component.x = 'G'
+        
+    def setC(self):
+        self.component.x = 'H'
+        
+    def setD(self):
+        self.component.x = 'I'
+          
+    def setE(self):
+        self.component.x = 'J'
+        
+
+class OptimizerRUM(RUM):
+    
+    def __init__(self, caller, called, optimizer):        
+        self.caller = caller
+        self.called = called
+        RUM.__init__(self, optimizer)
+        
+    def connectOptimizer(self):
+        self.InterjectOptimizerBetweenComponents(self.caller, self.called, self.optimizer)
+        
+    def disconnectOptimizer(self):
+        self.UndoInterjectionBetweenComponents(self.caller, self.called)
+        
+    def connectOptimizerOneMethod(self, method):
+        self.InterjectOptimizerBetweenComponentAndMethod(self.caller, self.called, method, self.optimizer)
+        
+    def disconnectOptimizerOneMethod(self, method):
+        self.UndoInterjectionBetweenComponentAndMethod(self.caller, self.called, method)
+
+    
+    
+    
+    
+    

@@ -1,0 +1,23 @@
+import abc
+from abc import ABCMeta
+
+class AbstractGearbox():
+    __metaclass__ = ABCMeta
+    
+    def __init__(self, maxGears):        
+        self.maximumGear = min(maxGears, 6)
+        self.gear = 1  
+        
+    @abc.abstractmethod
+    def incGear(self):
+        return
+    
+    @abc.abstractmethod
+    def decGear(self):
+        return
+    
+    def getMaxGears(self):
+        return self.maximumGear
+    
+    def getCurrentGear(self):
+        return self.gear

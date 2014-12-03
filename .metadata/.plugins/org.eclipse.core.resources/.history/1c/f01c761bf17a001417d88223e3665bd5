@@ -1,0 +1,640 @@
+from rum.statemachine.Guards import *
+from rum.statemachine.Operators import *
+from rum.statemachine.Operands import *
+
+'''-----QueryResult-----'''
+
+class AbstractRUMQuery(object):   
+    
+    def __init__(self):
+        return
+    
+    def query(self, RUM, desiredState):
+        return
+   
+class BasicRUMQuery(AbstractRUMQuery):
+    
+    def __init__(self, singleResult = False):
+        AbstractRUMQuery.__init__(self)
+        self.singleResult = singleResult
+    
+    def query(self, RUM, desiredState):
+        '''this method tells you which steps you must take to get from the current state, to the other state'''
+        if desiredState in RUM.getStates().keys():            
+            desiredState = RUM.getStates()[desiredState]
+        elif desiredState not in RUM.getStates().values():
+            raise Exception('The RUM does not have the desired state')      
+        
+        start = RUM.getCurrentState()
+        if(start == desiredState):
+            return []
+        paths = RUM.getStateRoutesFromTo(start, desiredState)
+        transitions = self.__convertStateRoutesToTransitions(paths)
+        steps = self.__convertTransitionsToRequirements(transitions)
+        return steps
+    
+    '''for each path, creates a list of state transitions.
+    Each transitions is a QueryTransition instance, containing
+    all information about the transition (oldstate, newstate, guard)'''
+    def __convertStateRoutesToTransitions(self, paths):
+        transitions = []
+        for path in paths:            
+            i = 0
+            trans = []
+            while i < len(path)-1:
+                trans.append(QueryTransition(path[i], path[i+1]))
+                i += 1
+            transitions.append(trans)
+        return transitions
+    
+    '''generates query results for the given transitions'''
+    def __convertTransitionsToRequirements(self, transitions):
+        result = []
+        for trans in transitions:
+            temp = []
+            for t in trans:
+                guard = t.getGuard()
+                temp.append(self.__visitAbstractGuard__(guard))       
+            if len(temp) > 0:
+                result.append(temp)
+        if len(result) == 1:
+            return result[0]
+        return result      
+    
+    '''visits the given guard, depending on what type of guard it is'''
+    def __visitAbstractGuard__(self, guard):        
+        if isinstance(guard, CompositeGuard):
+            return self.__visitCompositeGuard__(guard)
+        elif isinstance(guard, InvokedServiceGuard):
+            return self.__visitInvokedServiceGuard__(guard)
+        elif isinstance(guard, TrueGuard):
+            return self.__visitTrueGuard__(guard)
+        else:
+            return self.__visitGuard__(guard)
+        
+    def __visitCompositeGuard__(self, guard):
+        if isinstance(guard, AndGuard):
+            return self.__visitAndGuard__(guard)
+        else:
+            return self.__visitOrGuard__(guard)
+        
+    def __visitGuard__(self, guard):
+        left = guard.getLeft()
+        right = guard.getRight()
+        operator = guard.getOperator()
+        if AbstractGuard.isGuard(left):
+            left = self.__visitAbstractGuard__(left)  
+        if AbstractGuard.isGuard(right):
+            right = self.__visitAbstractGuard__(right)  
+        return self.__visitOperator__(guard, operator, left, right)
+    
+    def __visitTrueGuard__(self, guard):
+        return True
+    
+    def __visitInvokedServiceGuard__(self, guard):
+        return InvokeServiceQueryResult(self, guard.getComponent(), guard.getService())
+    
+    def __visitAndGuard__(self, guard):
+        result = AndQueryResult()
+        for subGuard in guard.getGuards():
+            temp = self.__visitAbstractGuard__(subGuard)
+            if not temp == []:
+                result.addQueryResult(self.__visitAbstractGuard__(subGuard))        
+        return result
+    
+    def __visitOrGuard__(self, guard):
+        result = OrQueryResult()
+        for subGuard in guard.getGuards():
+            result.addQueryResult(self.__visitAbstractGuard__(subGuard))        
+        return result
+    
+    def __visitOperator__(self, guard, operator, left, right):
+        if isinstance(guard.evaluate([], [], None, None), bool):
+            return self.__visitBooleanOperator__(guard, operator, left, right)
+        else:        
+            return self.__visitArithmeticOperator__(guard, operator, left, right)
+    
+    '''returns a list of queryResults, containing the information about
+    which fields are involved as operands of this operator.
+    left and right might already be lists of a queryResults with field information, 
+    in which case they are merged with any new fields'''
+    def __visitArithmeticOperator__(self, guard, operator, left, right):
+        result = None
+        if isinstance(left, CompositeQueryResult) and isinstance(right, CompositeQueryResult):
+            result = left
+            result.addQueryResults(right.getQueryResults)
+        elif isinstance(left, CompositeQueryResult):
+            result = left
+            left.merge(guard, right)            
+        elif isinstance(right, CompositeQueryResult):
+            result = right
+            right.merge(guard, left)
+        elif isinstance(left, QueryResult) and isinstance(right, QueryResult):
+            result = AndQueryResult()
+            result.addQueryResults(left)
+            result.addQueryResults(right)
+        elif isinstance(left, QueryResult) and isinstance(right, FieldVariableOperand):
+            result = AndQueryResult()
+            result.addQueryResults(left)    
+            result.addQueryResults(QueryResult(guard, [right.getComponent(), right.getName(), right.getStep()], None, 0))
+        elif isinstance(right, QueryResult) and isinstance(left, FieldVariableOperand):  
+            result = AndQueryResult()
+            result.addQueryResults(right)
+            result.addQueryResults(QueryResult(guard, [left.getComponent(), left.getName(), left.getStep()], None, 0))
+        elif isinstance(left, FieldVariableOperand) and isinstance(right, FieldVariableOperand):
+            result = AndQueryResult()
+            result.addQueryResults(QueryResult(guard, [left.getComponent(), left.getName(), left.getStep()], None, 0))
+            result.addQueryResults(QueryResult(guard, [right.getComponent(), right.getName(), right.getStep()], None, 0))
+        elif isinstance(left, FieldVariableOperand):
+            result = QueryResult(guard, [left.getComponent(), left.getName(), left.getStep()], None, 0)
+        elif isinstance(right, FieldVariableOperand):
+            result = QueryResult(guard, [right.getComponent(), right.getName(), right.getStep()], None, 0)            
+        self.__updateGuardsFor__(result, guard)            
+        return result
+        
+    '''checks if the current operator has boolean operands or not,
+    different methods are called to determine the queryResults depending
+    on the operands'''
+    def __visitBooleanOperator__(self, guard, operator, left, right):
+        result = None
+        if self.__areBooleanOperands__(left, right):   
+            result = self.__determineBooleanQueryResults__(guard, left, right)
+        else:
+            result = self.__determineNumericQueryResults__(guard, left, right)            
+        return result
+    
+    def  __determineNumericQueryResults__(self, guard, left, right):
+        '''left and right can be evaluated using the AbstractGuard.getValue() static function
+        in order to get their value, the following maps need to be supplied:
+        beforeVariables, afterVariables, else the variable will use the getattr function.
+        these two mappings need to contain values for all of the values in fieldVariables'''
+        fieldVariables = self.__extractVariables__(left, right)
+        fieldVariableValues = self.__extractVariableValues__(fieldVariables)
+        if len(fieldVariables) > 0:
+            component = fieldVariables[0][0]
+        else:
+            component = None        
+        gap = self.__determineGap__(left, right, fieldVariableValues, fieldVariableValues, component)          
+        adjusted = fieldVariableValues.copy()
+        if self.__correctSolution__(guard, adjusted, component):
+            result = self.__createQueryResultForArithmetic__(guard, left, right, fieldVariableValues, adjusted, fieldVariables)
+        else:        
+            result = self.__determineNumericQueryResultsHelper__(guard, left, right, fieldVariableValues, adjusted, fieldVariables, gap, [])   
+        result = self.__processAndOrderResults__(result)     
+        return result
+    
+    def __determineNumericQueryResultsHelper__(self, guard, left, right, originalFieldVariableValues, adjustedFieldVariableValues, fieldVariables, gap, used):
+        result = []        
+        for variable in fieldVariables:
+            if not variable in used:
+                self.__tryFindSolution__(guard, left, right, originalFieldVariableValues, adjustedFieldVariableValues, fieldVariables, gap, used, variable, 1, result)
+                if not self.singleResult or (len(result) == 0 and self.singleResult):
+                    self.__tryFindSolution__(guard, left, right, originalFieldVariableValues, adjustedFieldVariableValues, fieldVariables, gap, used, variable, -1, result)                
+        return result      
+    
+    def __tryFindSolution__(self, guard, left, right, originalFieldVariableValues, adjustedFieldVariableValues, fieldVariables, gap, used, variable, step, result):
+        while not self.singleResult or (len(result) == 0 and self.singleResult):
+            self.__adjustValue__(variable, adjustedFieldVariableValues, step*variable[2], guard)
+            newGap = self.__determineGap__(left, right, originalFieldVariableValues, adjustedFieldVariableValues, variable[0])
+            if self.__correctSolution__(guard, adjustedFieldVariableValues, variable[0]):
+                result.append(self.__createQueryResultForArithmetic__(guard, left, right, originalFieldVariableValues, adjustedFieldVariableValues, fieldVariables))
+                break
+            else:
+                tempUsed = list(used)
+                tempUsed.append(variable)
+                tempAdjusted = adjustedFieldVariableValues.copy()
+                result.extend(self.__determineNumericQueryResultsHelper__(guard, left, right, originalFieldVariableValues, tempAdjusted, fieldVariables, newGap, tempUsed))
+            if not self.__correctDirection__(gap, newGap):
+                break  
+        self.__resetValue__(variable, adjustedFieldVariableValues, originalFieldVariableValues, guard)
+            
+    def __determineGap__(self, left, right, oldFieldVariables, fieldVariables, component):
+        if isinstance(left, AbstractQueryResult):
+            left = left.getGuard()
+        if isinstance(right, AbstractQueryResult):
+            right = right.getGuard()
+        gap = AbstractGuard.getValue(left, oldFieldVariables, fieldVariables, component, None)-AbstractGuard.getValue(right, oldFieldVariables, fieldVariables, component, None)
+        return gap
+
+    def __correctSolution__(self, guard, fieldVariables, component):
+        return guard.evaluate(fieldVariables, fieldVariables, component, None)
+    
+    def __correctDirection__(self, gap, newGap):
+        if gap >= 0 and newGap >= 0:
+            return newGap < gap
+        elif gap <= 0 and newGap <= 0:
+            return newGap > gap        
+        else:
+            return False      
+        
+    '''compares the original field variable values to the adjusted values, 
+    creates QueryResults to represent the difference'''
+    def __createQueryResultForArithmetic__(self, guard, left, right, originalFieldVariableValues, adjustedFieldVariableValues, fieldVariables):
+        result = []
+        for variable in fieldVariables:
+            adjustment = adjustedFieldVariableValues[variable[1]] - originalFieldVariableValues[variable[1]]
+            if adjustment > 0:
+                result.append(QueryResult(guard, variable, "inc", abs(adjustment)))
+            elif adjustment < 0:
+                result.append(QueryResult(guard, variable, "dec", abs(adjustment)))  
+        if len(result) == 1:
+            result = result[0]
+        elif len(result) >1:
+            temp = AndQueryResult()
+            temp.addQueryResults(result)      
+            result = temp
+        return result
+        
+    '''extract all variables from left and right, 
+    put them in a list of lists [component, name, step]'''
+    def __extractVariables__(self, left, right):
+        result = []
+        if isinstance(left, AbstractQueryResult):            
+            variables = left.getVariables()
+            for variable in variables:
+                if variable not in result:
+                    result.append(variable)
+        elif isinstance(left, FieldVariableOperand):
+            result.append([left.getComponent(), left.getName(), left.getStep()])
+        if isinstance(right, AbstractQueryResult):
+            variables = right.getVariables()
+            for variable in variables:
+                if variable not in result:
+                    result.append(variable)
+        elif isinstance(right, FieldVariableOperand):
+            result.append([right.getComponent(), right.getName(), right.getStep()])
+        return result
+    
+    '''extract all variables from the list of variables, 
+    put them in a list of mappings [name] : value'''
+    def __extractVariableValues__(self, variables):
+        result = {}
+        for variable in variables:
+            value = getattr(variable[0], variable[1])
+            result[variable[1]] = value    
+        return result
+    
+    def __processAndOrderResults__(self, results):
+        '''results might contain duplicates, if so, remove them
+        if results has more than 1 entries, the root must become an OrQueryResult,
+        if results has 0 or 1 entry, do nothing'''        
+        if isinstance(results, list):
+            if len(results) == 1:
+                return results[0]
+            elif len(results) > 1:
+                withoutDuplicates = []
+                for result in results:
+                    notAlreadyAdded = True
+                    for entry in withoutDuplicates:
+                        notAlreadyAdded &= result != entry
+                    if notAlreadyAdded:
+                        withoutDuplicates.append(result)
+                results = OrQueryResult()
+                results.addQueryResults(withoutDuplicates)
+        return results
+    
+    '''adjusts the value of the given variable, adjusting it only in the supplied list,
+    unless a functionvalueoperand is in play, then the variable is really modified in its component'''
+    def __adjustValue__(self, variable, adjustedFieldVariableValues, adjustment, guard):
+        adjustedFieldVariableValues[variable[1]] += adjustment
+        if self.__containsFunctionValueOperand__(guard):
+            setattr(variable[0], variable[1], adjustedFieldVariableValues[variable[1]])
+        
+    def __resetValue__(self, variable, adjustedFieldVariableValues, originalFieldVariableValues, guard):        
+        adjustedFieldVariableValues[variable[1]] = originalFieldVariableValues[variable[1]]
+        if self.__containsFunctionValueOperand__(guard):
+            setattr(variable[0], variable[1], originalFieldVariableValues[variable[1]])
+        
+    def __containsFunctionValueOperand__(self, guard):
+        if 'left' in guard.__dict__.keys() and 'right' in guard.__dict__.keys():
+            if isinstance(guard.left, FunctionValueOperand) or isinstance(guard.right, FunctionValueOperand):
+                return True
+            if isinstance(guard.left, AbstractGuard) and self.__containsFunctionValueOperand__(guard.left):
+                return True
+            if isinstance(guard.right, AbstractGuard) and self.__containsFunctionValueOperand__(guard.right):
+                return True
+        return False        
+
+    def __areBooleanOperands__(self, left, right):
+        return self.__isBooleanOperand__(left) and self.__isBooleanOperand__(right)
+        
+    def __isBooleanOperand__(self, operand):
+        if isinstance(operand, AbstractGuard):
+            return isinstance(operand.getValue([], [], None, None), bool)
+        elif isinstance(operand, AbstractOperand):
+            return isinstance(operand.getValue([], [], None, None), bool)
+        else:
+            return isinstance(operand, bool)
+        
+    def __updateGuardsFor__(self, results, guard):
+        if isinstance(results, CompositeQueryResult):  
+            toUpdate = results.getQueryResults()
+        else:
+            toUpdate = [results]
+        for result in toUpdate:
+            result.guard = guard
+        return toUpdate
+    
+    def __determineBooleanQueryResults__(self, guard, left, right):
+        result = None       
+        if guard.operator.execute(True, True):
+            result = self.__determineBooleanQueryResultsHelper__(guard, left, right, True, True);
+        if guard.operator.execute(True, False):
+            result = self.__mergeResults__(self.__determineBooleanQueryResultsHelper__(guard, left, right, True, False), result);
+        if guard.operator.execute(False, True):
+            result = self.__mergeResults__(self.__determineBooleanQueryResultsHelper__(guard, left, right, False, True), result);
+        if guard.operator.execute(False, False):
+            result = self.__mergeResults__(self.__determineBooleanQueryResultsHelper__(guard, left, right, False, False), result);
+        return result
+    
+    def __determineBooleanQueryResultsHelper__(self, guard, left, right, desiredR, desiredL):
+        result = None     
+        
+        if (isinstance(left, AbstractQueryResult)):
+            if desiredL:
+                result = left
+            else:
+                l = left.copy()
+                l.invert()
+                result = l
+        
+        elif isinstance(left, FieldVariableOperand):
+            leftValue = AbstractGuard.getValue(left, [], [], left.getComponent(), None)            
+            if leftValue == desiredL:
+                result = QueryResult(guard, [left.getComponent(), left.getName()], None, leftValue)
+            else:
+                result = QueryResult(guard, [left.getComponent(), left.getName()], "Set", not leftValue)
+                
+        if (isinstance(right, AbstractQueryResult)):
+            temp = AndQueryResult()
+            temp.addQueryResult(result)
+            result = temp
+            if desiredR:
+                result.addQueryResult(right)
+            else:
+                r = right.copy()
+                r.invert()
+                result.addQueryResult(r)    
+            
+        elif isinstance(right, FieldVariableOperand):
+            temp = AndQueryResult()
+            temp.addQueryResult(result)
+            result = temp
+            rightValue = AbstractGuard.getValue(right, [], [], right.getComponent(), None)            
+            if rightValue == desiredR:
+                result.addQueryResult(QueryResult(guard, [right.getComponent(), right.getName()], None, rightValue))
+            else:
+                result.addQueryResult(QueryResult(guard, [right.getComponent(), right.getName()], "Set", not rightValue)) 
+            
+        return result
+    
+    def __mergeResults__(self, newResults, current):
+        if current == None:
+            current = newResults
+        elif isinstance(current, OrQueryResult):
+            current.addQueryResult(newResults)
+        else:
+            temp = OrQueryResult()
+            temp.addQueryResult(current)
+            temp.addQueryResult(newResults)
+            current = temp
+        return current
+        
+        
+class QueryTransition(object):
+        
+    def __init__(self, startState, endState):
+        self.startState = startState
+        self.endState = endState
+        
+    def getGuard(self):
+        exitGuards = getattr(self.startState, '__exit_guards__')
+        guards = []
+        for guard in exitGuards:
+            if self.endState == exitGuards[guard]:
+                guards.append(guard)
+        if len(guards) > 1:
+            result = OrGuard()
+            for guard in guards:
+                result.addGuard(guard)
+        else:
+            result = guards[0]        
+        return result 
+   
+class AbstractQueryResult(object):
+    
+    def invert(self):
+        self.inverted = not self.inverted
+        
+    def isInverted(self):
+        return self.inverted
+        
+    def copy(self):
+        raise NotImplementedError('classes which inherit from AbstractQueryResult must implement copy(self)')
+        
+    def __eq__(self, other):
+        raise NotImplementedError('classes which inherit from AbstractQueryResult must implement __eq__(self, other)')
+        
+    def __ne__(self, other):
+        return not self.__eq__(other) 
+    
+    def getGuard(self):
+        raise NotImplementedError('classes which inherit from AbstractQueryResult must implement getGuard(self)') 
+   
+    def getVariablesWithValues(self):
+        raise NotImplementedError('classes which inherit from AbstractQueryResult must implement getVariablesWithValues(self)')
+    
+    def getVariables(self):
+        raise NotImplementedError('classes which inherit from AbstractQueryResult must implement getVariables(self)')
+     
+    def getQueryResults(self):
+        raise NotImplementedError('classes which inherit from AbstractQueryResult must implement getQueryResults(self)')     
+        
+class CompositeQueryResult(AbstractQueryResult):
+    
+    def __init__(self):
+        self.queryResult = []
+        self.inverted = False
+        
+    def addQueryResult(self, result):
+        self.queryResult.append(result)
+        
+    def addQueryResults(self, results):
+        if isinstance(results, list):
+            for result in results:
+                self.addQueryResult(result)
+        else:
+            self.addQueryResult(results)  
+            
+    def getVariablesWithValues(self):
+        result = []
+        for query in self.queryResult:
+            result.append(query.getVariablesWithValues())
+        return result
+    
+    def getVariables(self):
+        result = []
+        for query in self.queryResult:
+            result.append(query.getField())
+        return result
+
+    def getQueryResults(self):
+        return self.queryResult
+    
+    def getGuard(self):
+        if len(self.queryResult) > 0:
+            return self.queryResult[0].getGuard()
+        else:
+            return None  
+        
+    def __ne__(self, other):
+        return not self.__eq__(other)  
+    
+    def merge(self, guard, other):
+        if isinstance(other, QueryResult):
+            self.addQueryResults(other)
+        elif isinstance(other, FieldVariableOperand):
+            self.addQueryResults(QueryResult(guard, [other.getComponent(), other.getName(), other.getStep()], None, 0))  
+   
+class QueryResult(AbstractQueryResult):
+    
+    def __init__(self, guard, field, action, value):
+        self.guard = guard
+        self.field = field
+        self.action = action
+        self.value = value
+        self.inverted = False
+        
+    def __repr__(self):
+        toPrint = '('+self.field[0].__repr__()+'.'+self.field[1].__repr__()
+        toPrint += ', '+self.action.__repr__()+','+self.value.__repr__()+')'
+        return toPrint
+    
+    def getQueryResults(self):
+        return (self.action, self.value, self.field)
+        
+    def getGuard(self):
+        return self.guard
+    
+    def getField(self):
+        return self.field
+    
+    def getValue(self):
+        return self.value
+    
+    def getAction(self):
+        return self.action
+   
+    def getVariablesWithValues(self):
+        return [self.field, self.value]
+    
+    def getVariables(self):
+        return [self.field]
+    
+    def __eq__(self, other):
+        if isinstance(other, QueryResult):
+            return self.getGuard() == other.getGuard() and self.getField() == other.getField() and self.getAction() == other.getAction() and self.getValue() == other.getValue()
+        else:
+            return False
+    
+    def copy(self):
+        copy = QueryResult(self.guard, list(self.field), self.action, self.value)
+        copy.inverted = self.inverted   
+   
+class OrQueryResult(CompositeQueryResult):
+                
+    def __repr__(self):
+        result = '('        
+        i = 1
+        for query in self.queryResult:
+            result += query.__repr__()
+            if i < len(self.queryResult):
+                result += ')OR('
+            i += 1
+        result += ')'
+        return result
+        
+    def __eq__(self, other):
+        if isinstance(other, OrQueryResult):
+            equal = len(self.getQueryResults()) == len(other.getQueryResults())
+            i = 0
+            while i < len(self.getQueryResults()):
+                equal &= self.getQueryResults()[i] == other.getQueryResults()[i]
+                i+=1
+            return equal  
+        else:
+            return False
+    
+    def invert(self):
+        self.inverted = not self.inverted
+    
+    def copy(self):
+        copy = OrQueryResult()
+        for query in self.queryResult:
+            copy.addQueryResult(query.copy())   
+        copy.inverted = self.inverted
+        return copy 
+        
+class AndQueryResult(CompositeQueryResult):
+            
+    def __repr__(self):
+        result = ''
+        i = 1
+        for query in self.queryResult:
+            result += query.__repr__()
+            if i < len(self.queryResult):
+                result += 'AND'
+            i += 1
+        return result
+    
+    def __eq__(self, other):
+        if isinstance(other, AndQueryResult):
+            equal = len(self.getQueryResults()) == len(other.getQueryResults())
+            i = 0
+            while equal and i < len(self.getQueryResults()):
+                equal &= self.getQueryResults()[i] == other.getQueryResults()[i]
+                i+=1
+            return equal  
+        else:
+            return False
+    
+    def copy(self):
+        copy = AndQueryResult()
+        for query in self.queryResult:
+            copy.addQueryResult(query.copy())   
+        copy.inverted = self.inverted
+        return copy
+    
+class InvokeServiceQueryResult(AbstractQueryResult):
+    
+    def __init__(self, guard, component, service):
+        self.inverted = False
+        self.guard = guard
+        self.component = component
+        self.service = service
+        
+    def __repr__(self):
+        return 'invoke service: '+self.service.__repr__()
+            
+    def copy(self):
+        result = InvokeServiceQueryResult(self.guard, self.component, self.service)
+        result.inverted = self.inverted
+        return result
+        
+    def __eq__(self, other):
+        if isinstance(other, InvokeServiceQueryResult):
+            return other.guard == self.guard and other.component == self.component and other.service == self.service and other.inverted == self.inverted
+        else:
+            return False
+    
+    def getGuard(self):
+        return self.guard
+   
+    def getVariablesWithValues(self):
+        return
+    
+    def getVariables(self):
+        return
+    
+    def getQueryResults(self):
+        return self.service

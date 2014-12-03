@@ -1,0 +1,49 @@
+from Vehicle.Optimizers.AbstractOptimizer import AbstractOptimizer
+
+class SpeedPerformanceOptimizer(AbstractOptimizer):
+    
+    def __init__(self, vehicle, propulsion, gearbox):
+        AbstractOptimizer.__init__(self, vehicle, propulsion, gearbox)
+
+    def __determinePossibleCombinations__(self, road):
+        desiredSpeed = road.getMaxSpeed()
+        combinations = []
+        gearboxStates = self.RUM.getStatesList(self.gearbox.RUM)
+        propulsionStates = self.RUM.getStatesDictionary(self.propulsion.RUM)
+        for state in gearboxStates:
+            self.gearbox.RUM.currentState = state
+            self.propulsion.RUM.currentState = propulsionStates['DrivingNormally']
+            self.__determinePossibleCombinationsHelper__(2, 50, combinations, desiredSpeed)
+            
+            self.propulsion.RUM.currentState = propulsionStates['DrivingRapidly']
+            self.__determinePossibleCombinationsHelper__(52, 101, combinations, desiredSpeed) 
+        return combinations
+    
+    def __determinePossibleCombinationsHelper__(self, start, end, combinations, desiredSpeed):
+        t = start
+        while t <= end:         
+            self.propulsion.throttle = t 
+            speed = self.vehicle.RUM.getSpeed()          
+            if speed > desiredSpeed:
+                combinations.append((self.gearbox.getRUM().currentState, self.propulsion.getRUM().currentState, t-1))
+                break
+            t+=1
+        
+    def __determineOptimalCombination__(self, combinations):
+        desiredCombination = combinations[0]
+        optimalSpeed = 0
+        optimalConsumption = 99999
+        for combination in combinations:
+            self.gearbox.getRUM().currentState = combination[0]
+            self.propulsion.getRUM().currentState = combination[1]
+            self.propulsion.throttle = combination[2]
+            consumption = self.propulsion.RUM.getConsumption()
+            speed = self.vehicle.RUM.getSpeed()
+            if consumption < optimalConsumption:
+                optimalConsumption = consumption
+                desiredCombination = combination
+            elif consumption == optimalConsumption and speed > optimalSpeed:
+                optimalSpeed = speed
+                desiredCombination = combination
+        return desiredCombination
+        

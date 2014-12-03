@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;O-O Vehicle Program/World/ALocation.py&apos; to &apos;AbstractLocation.py&apos;" description="Rename resource &apos;ALocation.py&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="World/ALocation.py" name="AbstractLocation.py" stamp="1404997723429" updateReferences="true"/>
+</session>

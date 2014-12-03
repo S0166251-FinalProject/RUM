@@ -1,0 +1,21 @@
+from test.query.QueryTests import *
+
+def main():
+    test = QueryEqualsTest()
+    test.execute()
+    test = QueryGreaterThanTest()
+    test.execute()
+    test = QuerySmallerThanTest()
+    test.execute()
+    test = QueryAndTest()
+    test.execute()
+    test = QueryNotEqualsTest()
+    test.execute()
+    test = QueryOrTest()
+    test.execute()
+    test = QueryCompositeTest()
+    test.execute()
+    
+    
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,11 @@
+INSTUPWorld.Weather.Weather
+C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Weather\Weather.py
+INFOS:&&1|1|2|0&&2|3|2|1&&2|4|2|1&&3|5|2|6&&3|5|2|6&&3|7|2|6&&2|8|2|1
+Weather=1
+World.Weather.Weather=2
+strength=5
+getResistance=8
+Weather.determineWeather=6
+determineWeather=4
+__init__=3
+direction=7

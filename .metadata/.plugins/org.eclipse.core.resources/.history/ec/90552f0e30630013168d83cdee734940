@@ -1,0 +1,384 @@
+from abc import *
+import abc
+import types
+import operator
+from inspect import *
+
+class RUM():
+    
+    def __init__(self, component):
+        self.component = component
+        self.transitions = []
+        self.operators = {"==":operator.eq,
+                          "!=":operator.__ne__,
+                          ">=":operator.ge,
+                          ">":operator.gt,
+                          "<=":operator.le,
+                          "<":operator.lt,
+                          "&":operator.and_,
+                          "|":operator.or_,
+                          "+":operator.__add__,
+                          "-":operator.__sub__,
+                          "*":operator.__mul__,
+                          "/":operator.__truediv__}
+            
+    def queryPossibleTransitions(self):
+        result = []
+        'create a list of all transitions that can happen from the current state'
+        eligibleTransitions = []
+        for transition in self.transitions:
+            if self.states.get(transition.currState) == self.state:
+                eligibleTransitions.append(transition)
+       
+                'for each of these transitions, compare the current state of the component to the state it must be in for the transition to happen'
+                'then store the necessary changes in result, together with which state can be reached if those changes happen'
+        for trans in eligibleTransitions:     
+            if(trans.condition.__code__.co_name == 'innerMethodNameCondition'):
+                result.append([trans.nextState , self.queryMethodNameCondition(trans.condition)])
+            elif(trans.condition.__code__.co_name == 'innerCondition'):
+                temp = self.queryCondition(trans.condition)                
+                if(type(temp)==list):
+                    if(len(temp)==1) & (type(temp[0]) == list):
+                        t = [trans.nextState]
+                        for entry in temp[0]:
+                            t.append(entry)
+                        result.append(t)
+                    else:
+                        for entry in temp:
+                            result.append([trans.nextState,  entry])
+                else:
+                    result.append([trans.nextState, temp])
+            elif(trans.condition.__code__.co_name == 'innerOldVarCondition'):
+                result.append([trans.nextState , self.queryOldVarCondition(trans.condition)])
+            elif(trans.condition.__code__.co_name == 'innerNewVarCondition'):
+                result.append([trans.nextState , self.queryNewVarCondition(trans.condition)])
+            elif(trans.condition.__code__.co_name == 'innerExternalMethodCondition'):
+                result.append([trans.nextState, self.queryExternalMethodCondition(trans.condition)])
+        print(result)
+        return result
+    
+    def queryCondition(self, condition):
+        result = []
+        operator = getmembers(condition)[0][1].get('newVars')
+        left = getmembers(condition)[0][1].get('oldVars')
+        right = getmembers(condition)[0][1].get('methodName')
+        
+        if(left.__code__.co_name == 'innerMethodNameCondition'):
+            l = self.queryMethodNameCondition(left)
+        elif(left.__code__.co_name == 'innerCondition'):
+            l = self.queryCondition(left)
+        elif(left.__code__.co_name == 'innerOldVarCondition'):
+            l = self.queryOldVarCondition(left)
+        elif(left.__code__.co_name == 'innerNewVarCondition'):
+            l = self.queryNewVarCondition(left)
+        
+        if(right.__code__.co_name == 'innerMethodNameCondition'):
+            r = self.queryMethodNameCondition(right)
+        elif(right.__code__.co_name == 'innerCondition'):       
+            r = self.queryCondition(right)
+        elif(right.__code__.co_name == 'innerOldVarCondition'):
+            r = self.queryOldVarCondition(right)
+        elif(right.__code__.co_name == 'innerNewVarCondition'):
+            r = self.queryNewVarCondition(right)  
+            
+        if(operator=='&')&(not len(l)==0)&(not len(r)==0):
+            temp = []
+            
+            if(left.__code__.co_name != 'innerOldVarCondition') &  (right.__code__.co_name == 'innerOldVarCondition'):
+                temp.append(l)
+                temp.append(r)
+            else:
+                temp.append(r)
+                temp.append(l)
+            result.append(temp)
+        elif(operator=='|')&(not len(l)==0)&(not len(r)==0):
+            if(left.__code__.co_name != 'innerOldVarCondition') &  (right.__code__.co_name == 'innerOldVarCondition'):
+                result.append(r)
+                result.append(l)
+            else:
+                result.append(l)
+                result.append(r)
+            while(len(result) == 1)&(type(result[0])==list):
+                result = result[0]
+        elif(not len(l)==0):
+            return l
+        else:
+            return r
+        return result
+        
+    def queryMethodNameCondition(self, condition):
+        return {getmembers(condition)[0][1].get('methodName') : 'call'}
+             
+    def queryOldVarCondition(self, condition):
+        operator = getmembers(condition)[0][1].get('newVars')
+        left = getmembers(condition)[0][1].get('oldVars')
+        right = getmembers(condition)[0][1].get('methodName')
+        'if oldVarCondition is already met at this time, then it is not relevant'
+        op = self.operators.get(operator)
+        value = getattr(self.component, left)
+        if(op(value, right)):
+            return []
+        if type(value) == bool:
+            if operator == '==':
+                return {left: right}
+            elif operator == '!=':
+                return {left: not right}
+        else:
+            if operator == '==':
+                return {left: (right - value)}
+            elif operator == '!=':
+                return {left: not right}
+            elif operator == '<':
+                return {left: (value-right-1)}
+            elif operator == '<=':
+                return {left: (value-right)}
+            elif operator == '>':
+                return {left: (right-value+1)}
+            elif operator == '>=':
+                return {left: (right-value)}
+    
+    def queryNewVarCondition(self, condition):
+        operator = getmembers(condition)[0][1].get('newVars')
+        left = getmembers(condition)[0][1].get('oldVars')
+        right = getmembers(condition)[0][1].get('methodName')
+        
+        value = getattr(self.component, left)
+        if type(value) == bool:
+            if operator == '==':
+                return {left: right}
+            elif operator == '!=':
+                return {left: not right}
+        else:
+            if operator == '==':
+                return {left: (right - value)}
+            elif operator == '!=':
+                return {left: not right}
+            elif operator == '<':
+                return {left: (value-right-1)}
+            elif operator == '<=':
+                return {left: (value-right)}
+            elif operator == '>':
+                return {left: (right-value+1)}
+            elif operator == '>=':
+                return {left: (right-value)}
+            
+    def queryExternalMethodCondition(self, condition):
+        operator = getmembers(condition)[0][1].get('newVars')
+        left = getmembers(condition)[0][1].get('oldVars')
+        right = getmembers(condition)[0][1].get('methodName')
+        value = left()
+        name = left.__func__.__name__
+        if type(value) == bool:
+            if operator == '==':
+                return {name: right}
+            elif operator == '!=':
+                return {name: not right}
+        else:
+            if operator == '==':
+                return {name: (right - value)}
+            elif operator == '!=':
+                return {name: not right}
+            elif operator == '<':
+                return {name: (value-right-1)}
+            elif operator == '<=':
+                return {name: (value-right)}
+            elif operator == '>':
+                return {name: (right-value+1)}
+            elif operator == '>=':
+                return {name: (right-value)}
+    
+    def condition(self, left, operator, right):
+        op = self.operators.get(operator)        
+        def innerCondition(oldVars: left, newVars: operator, methodName: right):
+            if hasattr(left, '__call__'):
+                if hasattr(right, '__call__'):                   
+                    return op(left(oldVars, newVars, methodName), right(oldVars, newVars, methodName))
+                else:
+                    return op(left(oldVars, newVars, methodName), right)
+            elif hasattr(right, '__call__'):
+                return op(left, right(oldVars, newVars, methodName)) 
+            else:
+                return op(left, right)
+        return innerCondition        
+            
+    def methodNameCondition(self, name):
+        def innerMethodNameCondition(oldVars, newVars, methodName: name):
+            return methodName == name
+        return innerMethodNameCondition      
+      
+    def oldVarCondition(self, left, operator, right):
+        op = self.operators.get(operator)
+        def innerOldVarCondition(oldVars: left, newVars: operator, methodName: right):           
+                return op(oldVars.get(left), right)
+        return innerOldVarCondition
+    
+    def newVarCondition(self, left, operator, right):        
+        op = self.operators.get(operator)
+        def innerNewVarCondition(oldVars: left, newVars: operator, methodName: right):            
+                return op(newVars.get(left), right)
+        return innerNewVarCondition
+     
+    def externalMethodCondition(self, left, operator, right):
+        op = self.operators.get(operator)
+        def innerExternalMethodCondition(oldVars: left, newVars: operator, methodName: right):
+            return op(left(), right)   
+        return innerExternalMethodCondition
+        
+    def switchMethods(self, original, replacement):
+        storage = getattr(self.component, original)
+        setattr(self.component, original, replacement) 
+        return storage
+    
+    def externalStateChangeCatcherBeforeAndAfter(self, method, target):
+        
+        def tempM(self, *args):
+            old = {}
+            for var in target.__dict__:
+                old[var] = getattr(target, var)       
+                
+            method(*args)
+            new = {}
+            for var in target.__dict__:
+                new[var] = getattr(target, var)
+            self.checkAndTransit(old, new, method.__name__)
+            
+        'add the new function to self as a bounded method'
+        setattr(self, method.__name__ ,types.MethodType(tempM, self))
+        print(getattr(target, method.__name__))
+        'replace the original method with the new function'        
+        setattr(target, method.__name__, getattr(self, method.__name__))
+        print(getattr(target, method.__name__))
+      
+    def stateChangeCatcherBeforeAndAfter(self, method):
+        
+        '''def tempM(self, *args):
+            old = {}
+            for var in self.component.__dict__:
+                old[var] = getattr(self.component, var)       
+                
+            method(*args)
+            new = {}
+            for var in self.component.__dict__:
+                new[var] = getattr(self.component, var)
+            self.checkAndTransit(old, new, method.__name__)
+            
+        'add the new function to self as a bounded method'
+        setattr(self, method.__name__ ,types.MethodType(tempM, self))
+        print(getattr(self.component, method.__name__))
+        'replace the original method with the new function'        
+        setattr(self.component, method.__name__, getattr(self, method.__name__))
+        print(getattr(self.component, method.__name__))'''
+                    
+        
+        'create dynamic replacement function at runtime'
+        func_str = "def "
+        func_str += method.__name__
+        func_str += "(self, *args):"
+        func_str += "\n\t"
+        func_str += "old = {}"
+        func_str += "\n\t"
+        for var in self.component.__dict__:
+            func_str += "old['"+var+"'] = self.component."+var
+            func_str += "\n\t"
+        func_str += "self."+method.__name__+"(*args)"
+        func_str += "\n\t"
+        func_str += "new = {}"
+        func_str += "\n\t"
+        for var in self.component.__dict__:
+            func_str += "new['"+var+"'] = self.component."+var
+            func_str += "\n\t"
+        func_str += "self.checkAndTransit(old, new, '"+method.__name__+"')"
+        func_str += "\n"
+        
+        'use exec to define the function'
+        exec(func_str)
+        
+        'add the function as a method to this class'
+        set_self = "self."+method.__name__+" = types.MethodType("+method.__name__+", self)"
+        exec(set_self)
+        
+        'retrieve the original method'
+        temp = getattr(self.component, method.__name__)
+        
+        'replace it with the new function'
+        set_replacement = "setattr(self.component, '"+method.__name__+"', self."+method.__name__)"
+        exec(set_replacement) 
+        
+        'add the original method to this class so it can be called by the function defined earlier'
+        set_original = "self."+method.__name__+"=temp"
+        exec(set_original)
+        
+     
+    def addStates(self, states):
+        self.states = states
+        self.state = None
+        
+    def setInitialState(self, state):
+        if self.state == None:
+            self.state = self.states.get(state)
+        
+    def addTransition(self, transition):
+        self.transitions.append(transition)
+        
+    def checkAndTransit(self, oldVars, newVars, methodName):
+        transited = False
+        for transition in self.transitions:
+            if self.states.get(transition.currState) == self.state:
+                if transition.shouldTransit(oldVars, newVars, methodName):
+                    self.state = self.states.get(transition.nextState)
+                    transited = True
+                    self.queryPossibleTransitions()
+        if(transited):
+            self.checkAndTransit(oldVars, newVars, methodName)
+                    
+        
+class Transition():
+    
+    def __init__(self, currState, nextState, condition):
+        self.currState = currState
+        self.nextState = nextState
+        self.condition = condition
+        
+    'returns true if the current state warrants a transit to the nextState'
+    def shouldTransit(self, oldVars, newVars, methodName):
+        transit = self.condition(oldVars, newVars, methodName)
+        if(transit):
+            print("going from "+self.currState.__str__()+" to "+self.nextState.__str__())
+        else:
+            print("couldnt go from "+self.currState.__str__()+" to "+self.nextState.__str__())
+        return transit
+   
+class Condition():    
+    
+    def __init__(self, expression):
+        self.expression = expression
+    
+    def validates(self, oldVariables, newVariables, methodName):
+        expr = ""
+        expr += self.expression
+        expr = self.loadVar(expr, oldVariables, "old:")
+        expr = self.loadVar(expr, newVariables, "new:")
+        expr = self.loadMethodNames(expr, methodName)     
+        return eval(expr)
+    
+    def loadVar(self, expr, variables, keyword):
+        'search for keyword (old: or new:), replace it with the corresponding variable'
+        result = ""
+        words = expr.split()
+        for word in words:
+            if word.startswith(keyword):
+                result += variables.get(word.replace(keyword, "")).__str__()+" "
+            else:
+                result += word+" "
+        return result
+                
+    def loadMethodNames(self, expr, methodName):
+        'search for methodName:, replace it with the methodName variable'
+        result = ""
+        words = expr.split()
+        for word in words:
+            if word.startswith("methodName:"):
+                result += word.replace("methodName:", "'"+methodName+"'") +" "
+            else:
+                result += word+" "
+        return result

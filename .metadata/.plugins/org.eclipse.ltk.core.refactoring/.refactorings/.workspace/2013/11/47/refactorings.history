@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;Vehicle RUM&apos; to &apos;Python Vehicle example&apos;" description="Rename resource &apos;Vehicle RUM&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="/Vehicle RUM" name="Python Vehicle example" stamp="1385123384530" updateReferences="true"/>
+</session>

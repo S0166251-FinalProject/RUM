@@ -1,0 +1,16 @@
+from Vehicle.AbstractVehicle import *
+
+class Vehicle(AbstractVehicle):
+    
+    def __init__(self, name, propulsion, gearbox, fueltank, routePlanner, trunk, circumference):
+        AbstractVehicle.__init__(self, name, propulsion, gearbox, fueltank, routePlanner, trunk, circumference)     
+            
+    def driveTo(self, destination):           
+        world = self.getRoutePlanner().getWorld()
+        connection = world.findConnection(self.routePlanner.getCurrentLocation(), destination)
+        if connection != None: 
+            time = world.driveVehicleTo(self, destination)
+            if time > 0:            
+                self.routePlanner.setCurrentLocation(destination)
+            return time
+        return 0

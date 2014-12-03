@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="java.util.Random"/>
+<fullyQualifiedTypeName name="rum.Driver"/>
+<fullyQualifiedTypeName name="rum.IState"/>
+<fullyQualifiedTypeName name="javax.script.ScriptEngineManager"/>
+<fullyQualifiedTypeName name="java.lang.reflect.Field"/>
+<fullyQualifiedTypeName name="java.util.Arrays"/>
+<fullyQualifiedTypeName name="rum.Rule"/>
+<fullyQualifiedTypeName name="vehicle.RoutePlanner"/>
+<fullyQualifiedTypeName name="world.World"/>
+<fullyQualifiedTypeName name="world.RoadNetwork"/>
+<fullyQualifiedTypeName name="vehicle.FuelTank"/>
+<fullyQualifiedTypeName name="world.Road"/>
+<fullyQualifiedTypeName name="world.Weather"/>
+<fullyQualifiedTypeName name="vehicle.Gearbox"/>
+<fullyQualifiedTypeName name="world.FuelStation"/>
+<fullyQualifiedTypeName name="vehicle.Engine"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="org.aspectj.lang.JoinPoint"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="rum.RUMAspect"/>
+<fullyQualifiedTypeName name="rum.vehicle.VehicleRUM"/>
+<fullyQualifiedTypeName name="vehicle.Vehicle"/>
+<fullyQualifiedTypeName name="rum.vehicle.EngineRUM"/>
+<fullyQualifiedTypeName name="java.lang.reflect.Method"/>
+<fullyQualifiedTypeName name="java.lang.System"/>
+</qualifiedTypeNameHistroy>

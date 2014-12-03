@@ -1,0 +1,28 @@
+import abc
+from abc import ABCMeta
+import random
+
+class AbstractWeather(object):
+
+    __metaclass__ = ABCMeta
+    direction_front = 1
+    direction_side = 2
+    direction_back = 3
+    max_strength = 5
+
+    def __init__(self):        
+        'wind strength'        
+        self.strength = random.randrange(0, self.max_strength, 1)
+        'direction is where the wind is coming from compared to the car, so front, back or side'
+        self.direction = random.randrange(0,3,1)
+    
+    @abc.abstractmethod    
+    def determineWeather(self):
+        return
+    
+    @abc.abstractmethod    
+    def getResistance(self):
+        return
+        
+    def getDirection(self):
+        return self.direction

@@ -1,0 +1,30 @@
+from rum.RUM import RUM
+from optparse import OptionParser
+import inspect
+from rum.statemachine.Query import *
+
+class VehicleOptimizerRUM(RUM):
+
+    def __init__(self, vehicle, propulsion, gearbox, optimizer):        
+        self.vehicle = vehicle
+        self.gearbox = gearbox
+        self.propulsion = propulsion
+        RUM.__init__(self, optimizer, BasicRUMQuery())
+        
+    def connectOptimizer(self):
+        self.InterjectOptimizerBetweenComponentAndMethod(self.vehicle, self.vehicle.gearbox, self.vehicle.gearbox.incGear, self.optimizer)
+        self.InterjectOptimizerBetweenComponents(self.vehicle, self.vehicle.gearbox, self.optimizer)
+        self.InterjectOptimizerBetweenComponents(self.vehicle, self.vehicle.propulsion, self.optimizer)      
+    
+                
+    
+        
+        
+        
+        
+        
+        
+        
+               
+    
+        

@@ -1,0 +1,54 @@
+''' 
+    Lines of Code: 26
+    Max CC2: 2
+    LCOM4: 1
+    TCC:
+    CBO: 12
+    CF:    
+'''
+
+from Vehicle.Gearbox.Gearbox import Gearbox
+from Vehicle.Fueltank.Fueltank import Fueltank
+from Vehicle.Cargo.Trunk import Trunk
+from Vehicle.Propulsion.Propulsion import Propulsion
+from Vehicle.RoutePlanner import RoutePlanner
+from Vehicle.DeliveryVehicle import Vehicle
+from Vehicle.Optimizers.SpeedPerformanceOptimizer import SpeedPerformanceOptimizer
+from Vehicle.Optimizers.FuelEfficiencyOptimizer import FuelEfficiencyOptimizer
+from Rum.GearboxRUM import GearboxRUM
+from Rum.PropulsionRUM import PropulsionRUM
+from Rum.VehicleRUM import VehicleRUM
+from Rum.Optimizer.VehicleOptimizerRUMs import VehicleOptimizerRUM
+
+class VehicleFactory(object):
+
+    def __init__(self):
+        return
+    
+    def CreateSpeedyVehicle(self, maxGears, maxFuel, trunkVolume, automatic, circumference, world, packages):  
+        '''create the part of the vehicle'''        
+        gearbox = Gearbox(maxGears)
+        fueltank = Fueltank(maxFuel)
+        trunk = Trunk(trunkVolume)
+        propulsion = Propulsion()
+        routePlanner = RoutePlanner(world, packages)        
+        '''create RUMS'''
+        gearboxRUM = GearboxRUM(gearbox)
+        propulsionRUM = PropulsionRUM(propulsion)
+        
+        vehicle = Vehicle("delivery", propulsion, gearbox, fueltank, routePlanner, trunk, circumference)        
+        vehicleRUM = VehicleRUM(vehicle, gearboxRUM, propulsionRUM)
+        vehicle.RUM = vehicleRUM
+        propulsion.RUM = propulsionRUM
+        gearbox.RUM = gearboxRUM
+        
+        vehicleOptimizer = FuelEfficiencyOptimizer(vehicle, propulsion, gearbox)
+        vehicleOptimizerRUM = VehicleOptimizerRUM(vehicle, propulsion, gearbox, vehicleOptimizer)
+        vehicleOptimizer.RUM = vehicleOptimizerRUM
+        vehicleOptimizerRUM.connectOptimizer()
+        
+        return vehicle
+    
+        
+        
+        

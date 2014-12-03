@@ -1,0 +1,55 @@
+import types
+
+class AbstractOperand(object):
+    
+    def getValue(self, beforeVariables, afterVariables, component, method):
+        raise NotImplementedError('Classes which inherit from rum.Guards.Operand must implement getValue(self, variables, component, method)') 
+    
+class FieldVariableOperand(AbstractOperand):
+    
+    def __init__(self, component, field, step=1):
+        AbstractOperand.__init__(self)
+        self.field = field
+        self.component = component
+        self.step = step
+        
+    def getValue(self, beforeVariables, afterVariables, component, method):
+        '''return the value of the given field, either from the afterVariables list,
+        or by using the getattr function'''
+        if self.field in afterVariables and component == self.component:
+            return afterVariables[self.field]
+        else:
+            return self.getCurrentValue()
+        
+    def getCurrentValue(self):
+        return getattr(self.component, self.field)
+    
+    def getName(self):
+        return self.field
+    
+    def getComponent(self):
+        return self.component
+    
+    def getStep(self):
+        return self.step
+    
+class FunctionValueOperand(AbstractOperand):
+        
+    '''the init method creates a wrapper for the getValue method, allowing the 
+    *args and **kwargs variables to be stored inside the closure of this wrapper.
+    This way they can be used directly in the call to the function which this operand represents'''
+    def __init__(self, component, function, *args, **kwargs):
+        AbstractOperand.__init__(self)
+        self.function = function
+        self.component = component
+        def getValueWrapper(self, beforeVariables, afterVariables, component, method, *args, **kwargs):
+            return getattr(self.component, self.function)(*args, **kwargs)
+        getValueWrapper.__name__ = self.getValue.__name__
+        setattr(self, "getValue", types.MethodType(getValueWrapper, self))        
+        
+    def getValue(self, beforeVariables, afterVariables, component, method):      
+        return getattr(self.component, self.function)()
+    
+    def getCurrentValue(self, *args, **kwargs):
+        return self.getValue([], [], None, None, *args, **kwargs)
+   

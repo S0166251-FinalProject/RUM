@@ -1,0 +1,176 @@
+from rum.RUM import RUM
+from rum.statemachine.States import State
+from rum.statemachine.Guards import *
+from rum.statemachine.Operators import *
+from rum.statemachine.Operands import *
+
+class PropulsionRUM(RUM):
+
+    def __init__(self, propulsion):
+        self.propulsion = propulsion
+        RUM.__init__(self)
+        self.registerToServiceInvocation(propulsion, propulsion.incThrottle)
+        self.registerToServiceInvocation(propulsion, propulsion.decThrottle)
+        self.registerToServiceInvocation(propulsion, propulsion.engineOn)
+        self.registerToServiceInvocation(propulsion, propulsion.engineOff) 
+        
+    def __setupStates__(self):
+        self.addState(PropulsionOffState('Off', self.propulsion))
+        self.addState(PropulsionStationaryState('Stationary', self.propulsion))
+        self.addState(PropulsionDrivingNormallyState('DrivingNormally', self.propulsion))
+        self.addState(PropulsionDrivingRapidlyState('DrivingRapidly', self.propulsion))
+        self.setInitialState('Off')
+        
+    def getRPM(self, weightMod, steepness, weather):
+        return self.currentState.getRPM(weightMod, steepness, weather)
+    
+    def getConsumption(self):
+        return self.currentState.getConsumption()    
+    
+class AbstractPropulsionState(State):
+    
+    __metaclass__ = ABCMeta
+    
+    def __init__(self, name, propulsion):
+        State.__init__(self, name)
+        self.propulsion = propulsion
+         
+    def getRPM(self, weightMod, steepness, weather):
+        return 0
+    
+    def getConsumption(self):
+        return 0
+        
+class PropulsionOffState(AbstractPropulsionState):
+    
+    def __setupStateTransitions__(self, states):
+        guard = AndGuard()
+        g1 = InvokedServiceGuard(self.propulsion, self.propulsion.engineOn)
+        guard.addGuard(g1) 
+        leftOperand = FieldVariableOperand(self.propulsion, 'on')         
+        g2 = Guard(EqualsOperator(), leftOperand, True)            
+        guard.addGuard(g2)  
+        leftOperand = FieldVariableOperand(self.propulsion, 'throttle')  
+        rightOperand = 0 
+        g3 = Guard(EqualsOperator(), leftOperand, rightOperand)
+        guard.addGuard(g3)
+        self.addStateTransition(states['Stationary'], guard)
+        
+        guard = AndGuard()
+        g1 = InvokedServiceGuard(self.propulsion, self.propulsion.engineOn)
+        guard.addGuard(g1) 
+        leftOperand = FieldVariableOperand(self.propulsion, 'on')         
+        g2 = Guard(EqualsOperator(), leftOperand, True)            
+        guard.addGuard(g2)  
+        leftOperand = FieldVariableOperand(self.propulsion, 'throttle')   
+        rightOperand = 0      
+        g3 = Guard(GreaterThanOperator(), leftOperand, rightOperand)  
+        guard.addGuard(g3)  
+        rightOperand = 51
+        g4 = Guard(SmallerThanOperator(), leftOperand, rightOperand)         
+        guard.addGuard(g4)  
+        self.addStateTransition(states['DrivingNormally'], guard)
+        
+        guard = AndGuard()
+        g1 = InvokedServiceGuard(self.propulsion, self.propulsion.engineOn)
+        guard.addGuard(g1) 
+        leftOperand = FieldVariableOperand(self.propulsion, 'on')         
+        g2 = Guard(EqualsOperator(), leftOperand, True)            
+        guard.addGuard(g2) 
+        leftOperand = FieldVariableOperand(self.propulsion, 'throttle')   
+        rightOperand = 50      
+        g3 = Guard(GreaterThanOperator(), leftOperand, rightOperand)  
+        guard.addGuard(g3)
+        self.addStateTransition(states['DrivingRapidly'], guard)     
+        
+    
+class PropulsionStationaryState(AbstractPropulsionState):
+   
+    def getConsumption(self):
+        return 1
+    
+    def __setupStateTransitions__(self, states):
+        guard = AndGuard()
+        guard.addGuard(InvokedServiceGuard(self.propulsion, self.propulsion.engineOff)) 
+        leftOperand = FieldVariableOperand(self.propulsion, 'on')  
+        guard.addGuard(Guard(EqualsOperator(), leftOperand, False)  )   
+        self.addStateTransition(states['Off'], guard)
+        
+        guard = AndGuard()
+        leftOperand = FieldVariableOperand(self.propulsion, 'on')    
+        guard.addGuard(Guard(EqualsOperator(), leftOperand, True))
+        leftOperand = FieldVariableOperand(self.propulsion, 'throttle')  
+        guard.addGuard(Guard(GreaterThanOperator(), leftOperand, 0))  
+        guard.addGuard(Guard(SmallerThanOperator(), leftOperand, 51))  
+        self.addStateTransition(states['DrivingNormally'], guard)
+        
+        guard = AndGuard()
+        leftOperand = FieldVariableOperand(self.propulsion, 'on')    
+        guard.addGuard(Guard(EqualsOperator(), leftOperand, True))
+        leftOperand = FieldVariableOperand(self.propulsion, 'throttle')   
+        guard.addGuard(Guard(GreaterThanOperator(), leftOperand, 50))    
+        self.addStateTransition(states['DrivingRapidly'], guard)
+
+class PropulsionDrivingNormallyState(AbstractPropulsionState):
+    
+    def getConsumption(self):
+        return self.propulsion.getThrottle()/(100/19)+1 
+    
+    def getRPM(self, weightMod, steepness, weather):
+        resistance = weather.getResistance()+steepness
+        resistance = 1+resistance/100        
+        return (self.propulsion.getThrottle()/(100/3100)+900*weightMod)/resistance
+    
+    def __setupStateTransitions__(self, states):
+        guard = AndGuard()
+        guard.addGuard(InvokedServiceGuard(self.propulsion, self.propulsion.engineOff)) 
+        leftOperand = FieldVariableOperand(self.propulsion, 'on')  
+        guard.addGuard(Guard(EqualsOperator(), leftOperand, False)  )   
+        self.addStateTransition(states['Off'], guard)
+        
+        guard = AndGuard()
+        leftOperand = FieldVariableOperand(self.propulsion, 'on')    
+        guard.addGuard(Guard(EqualsOperator(), leftOperand, True))
+        leftOperand = FieldVariableOperand(self.propulsion, 'throttle')  
+        guard.addGuard(Guard(EqualsOperator(), leftOperand, 0))  
+        self.addStateTransition(states['Stationary'], guard)
+        
+        guard = AndGuard()
+        leftOperand = FieldVariableOperand(self.propulsion, 'on')    
+        guard.addGuard(Guard(EqualsOperator(), leftOperand, True))
+        leftOperand = FieldVariableOperand(self.propulsion, 'throttle')   
+        guard.addGuard(Guard(GreaterThanOperator(), leftOperand, 50))    
+        self.addStateTransition(states['DrivingRapidly'], guard)
+    
+class PropulsionDrivingRapidlyState(AbstractPropulsionState):
+    
+    def getConsumption(self):
+        return self.propulsion.getThrottle()/(100/19)+(self.propulsion.getThrottle()-50)/(100/30)+1
+    
+    def getRPM(self, weightMod, steepness, weather):
+        resistance = weather.getResistance()+steepness
+        resistance = 1+resistance/100        
+        return (self.propulsion.getThrottle()/(100/3100)+900*weightMod)/resistance
+    
+    def __setupStateTransitions__(self, states):
+        guard = AndGuard()
+        guard.addGuard(InvokedServiceGuard(self.propulsion, self.propulsion.engineOff)) 
+        leftOperand = FieldVariableOperand(self.propulsion, 'on')  
+        guard.addGuard(Guard(EqualsOperator(), leftOperand, False)  )   
+        self.addStateTransition(states['Off'], guard)
+        
+        guard = AndGuard()
+        leftOperand = FieldVariableOperand(self.propulsion, 'on')    
+        guard.addGuard(Guard(EqualsOperator(), leftOperand, True))
+        leftOperand = FieldVariableOperand(self.propulsion, 'throttle')  
+        guard.addGuard(Guard(EqualsOperator(), leftOperand, 0))  
+        self.addStateTransition(states['Stationary'], guard)
+        
+        guard = AndGuard()
+        leftOperand = FieldVariableOperand(self.propulsion, 'on')    
+        guard.addGuard(Guard(EqualsOperator(), leftOperand, True))
+        leftOperand = FieldVariableOperand(self.propulsion, 'throttle')  
+        guard.addGuard(Guard(GreaterThanOperator(), leftOperand, 0))  
+        guard.addGuard(Guard(SmallerThanOperator(), leftOperand, 51))  
+        self.addStateTransition(states['DrivingNormally'], guard)
+        

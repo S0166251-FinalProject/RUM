@@ -1,0 +1,352 @@
+from test.BaseTest import BaseTest
+from rum.RUM import RUM
+from rum.statemachine.States import State
+from rum.statemachine.Guards import *
+from rum.statemachine.Operators import *
+from rum.statemachine.Operands import *
+import time
+
+class BasicTest(BaseTest):
+
+    def __init__(self):
+        BaseTest.__init__(self, "SingleRumSingleComponentOneServiceTest", "ABB")
+        self.component = Component()
+        self.rum = BasicTestRUM(self.component)        
+        
+    def execute(self):
+        self.component.setA()
+        result = self.rum.currentState.name.__repr__()[1]
+        self.component.setB()
+        result += self.rum.currentState.name.__repr__()[1]
+        self.component.setA()
+        result += self.rum.currentState.name.__repr__()[1]
+        BaseTest.execute(self, result)     
+
+class BasicTestTwo(BaseTest):
+
+    def __init__(self):
+        BaseTest.__init__(self, "SingleRumSingleComponentTwoServicesTest", "ABA")
+        self.component = Component()
+        self.rum = BasicTestTwoRUM(self.component)        
+        
+    def execute(self):
+        self.component.setA()
+        result = self.rum.currentState.name.__repr__()[1]
+        self.component.setB()
+        result += self.rum.currentState.name.__repr__()[1]
+        self.component.setA()
+        result += self.rum.currentState.name.__repr__()[1]
+        BaseTest.execute(self, result)  
+
+class TwoInstancesOfComponentTest(BaseTest):
+
+    def __init__(self):
+        BaseTest.__init__(self, "SingleRumTwoInstancesTest", "BBB")
+        self.component = Component()
+        self.other = Component()
+        self.rum = BasicTestTwoRUM(self.component)        
+        
+    def execute(self):
+        self.component.setB()
+        result = self.rum.currentState.name.__repr__()[1]
+        self.other.setB()
+        result += self.rum.currentState.name.__repr__()[1]
+        self.other.setA()
+        result += self.rum.currentState.name.__repr__()[1]
+        BaseTest.execute(self, result)        
+        
+class TwoInstancesOfComponentTestTwo(BaseTest):
+
+    def __init__(self):
+        BaseTest.__init__(self, "SingleRumTwoInstancesTwoComponentTest", "CBCA")
+        self.component = Component()
+        self.other = Component()
+        self.rum = TwoInstancesTestRUM(self.component, self.other)        
+        
+    def execute(self):
+        self.component.setB()
+        result = self.rum.currentState.name.__repr__()[1]
+        self.other.setB()
+        result += self.rum.currentState.name.__repr__()[1]
+        self.other.setA()
+        result += self.rum.currentState.name.__repr__()[1]
+        self.component.setA()
+        result += self.rum.currentState.name.__repr__()[1]
+        BaseTest.execute(self, result)      
+        
+class StaticMethodInterceptionTest(BaseTest):
+
+    def __init__(self):
+        BaseTest.__init__(self, "StaticMethodTest", "BAA")
+        self.component = Component()
+        self.rum = StaticMethodTestRUM(self.component)        
+        
+    def execute(self):
+        self.component.setB()
+        result = self.rum.currentState.name.__repr__()[1]
+        self.component.setA()
+        result += self.rum.currentState.name.__repr__()[1]
+        Component.setC(self.component)
+        result += self.rum.currentState.name.__repr__()[1]
+        BaseTest.execute(self, result)     
+
+class StaticMethodInterceptionTestTwo(BaseTest):
+
+    def __init__(self):
+        BaseTest.__init__(self, "StaticMethodTestTwo", "BAC")
+        self.component = Component()
+        self.rum = StaticMethodTestRUMTwo(self.component)        
+        
+    def execute(self):
+        self.component.setB()
+        result = self.rum.currentState.name.__repr__()[1]
+        self.component.setA()
+        result += self.rum.currentState.name.__repr__()[1]
+        Component.setC(self.component)
+        result += self.rum.currentState.name.__repr__()[1]
+        BaseTest.execute(self, result)     
+        
+class TwoRUMTest(BaseTest):
+    
+    def __init__(self):
+        BaseTest.__init__(self, "TwoRumTest", "BBAA")
+        self.component = Component()
+        self.rum = BasicTestTwoRUM(self.component)        
+        self.otherRum = BasicTestTwoRUM(self.component)   
+        
+    def execute(self):
+        self.component.setB()
+        result = self.rum.currentState.name.__repr__()[1]
+        result += self.rum.currentState.name.__repr__()[1]
+        self.component.setA()
+        result += self.rum.currentState.name.__repr__()[1]
+        result += self.rum.currentState.name.__repr__()[1]
+        BaseTest.execute(self, result)     
+        
+      
+class BasicTestRUM(RUM):
+    
+    def __init__(self, comp): 
+        self.comp = comp         
+        RUM.__init__(self)   
+        self.registerToServiceInvocation(comp, comp.setB)
+        
+    def __setupStates__(self):      
+        self.addState(AState('A', self.comp))
+        self.addState(BState('B', self.comp)) 
+        self.setInitialState('A')
+        
+class BasicTestTwoRUM(RUM):
+    
+    def __init__(self, comp): 
+        self.comp = comp         
+        RUM.__init__(self)  
+        self.registerToServiceInvocation(comp, comp.setA) 
+        self.registerToServiceInvocation(comp, comp.setB)
+        
+    def __setupStates__(self):      
+        self.addState(AState('A', self.comp))
+        self.addState(BState('B', self.comp)) 
+        self.setInitialState('A')
+        
+class TwoInstancesTestRUM(RUM):
+    
+    def __init__(self, comp, other): 
+        self.comp = comp         
+        self.other = other
+        RUM.__init__(self)  
+        self.registerToServiceInvocation(comp, comp.setA) 
+        self.registerToServiceInvocation(comp, comp.setB)
+        self.registerToServiceInvocation(other, other.setA) 
+        self.registerToServiceInvocation(other, other.setB)
+        
+    def __setupStates__(self):      
+        self.addState(AStateTwoInstances('A', self.comp, self.other))
+        self.addState(BStateTwoInstances('B', self.comp, self.other)) 
+        self.addState(CStateTwoInstances('C', self.comp, self.other)) 
+        self.setInitialState('A')
+        
+class StaticMethodTestRUM(RUM):
+    
+    def __init__(self, comp): 
+        self.comp = comp       
+        RUM.__init__(self)  
+        self.registerToServiceInvocation(comp, comp.setA) 
+        self.registerToServiceInvocation(comp, comp.setB)
+        self.registerToServiceInvocation(comp, comp.setC)
+        
+    def __setupStates__(self):      
+        self.addState(AStateStatic('A', self.comp))
+        self.addState(BStateStatic('B', self.comp)) 
+        self.addState(CStateStatic('C', self.comp)) 
+        self.setInitialState('A')
+
+class StaticMethodTestRUMTwo(RUM):
+    
+    def __init__(self, comp): 
+        self.comp = comp       
+        RUM.__init__(self)  
+        self.registerToServiceInvocation(comp, comp.setA) 
+        self.registerToServiceInvocation(comp, comp.setB)
+        self.registerToServiceInvocation(Component, Component.setC)
+        
+    def __setupStates__(self):      
+        self.addState(AStateStatic('A', self.comp))
+        self.addState(BStateStatic('B', self.comp)) 
+        self.addState(CStateStatic('C', self.comp)) 
+        self.setInitialState('A')    
+        
+class Component(object):
+        
+    def __init__(self):
+        self.x = 'A'
+        
+    def setA(self):
+        self.x = 'A'
+        
+    def setB(self):
+        self.x = 'B'
+        
+    @staticmethod
+    def setC(self):
+        self.x = 'C'
+        
+class AState(State):
+    
+    def __init__(self, name, comp):
+        State.__init__(self,  name)
+        self.comp = comp
+        
+    def __setupStateTransitions__(self, states):
+        leftOperand = FieldVariableOperand(self.comp, 'x')
+        rightOperand = 'B'   
+        guard = Guard(EqualsOperator(), leftOperand, rightOperand )          
+        self.addStateTransition(states['B'], guard)
+    
+class BState(State):
+    
+    def __init__(self, name, comp):
+        State.__init__(self,  name)
+        self.comp = comp
+        
+    def __setupStateTransitions__(self, states):
+        leftOperand = FieldVariableOperand(self.comp, 'x')
+        rightOperand = 'A'   
+        guard = Guard(EqualsOperator(), leftOperand, rightOperand )          
+        self.addStateTransition(states['A'], guard)
+        
+class AStateTwoInstances(State):
+    
+    def __init__(self, name, comp, other):
+        State.__init__(self,  name)
+        self.comp = comp
+        self.other = other
+        
+    def __setupStateTransitions__(self, states):
+        leftOperand = FieldVariableOperand(self.comp, 'x')
+        rightOperand = 'B'   
+        compGuard = Guard(EqualsOperator(), leftOperand, rightOperand )   
+        leftOperand = FieldVariableOperand(self.other, 'x')
+        rightOperand = 'B'    
+        otherGuard = Guard(EqualsOperator(), leftOperand, rightOperand)   
+        self.addStateTransition(states['B'], Guard(AndOperator(), compGuard, otherGuard))
+        
+        otherGuardA = Guard(EqualsOperator(), leftOperand, 'A')  
+        self.addStateTransition(states['C'], Guard(AndOperator(), compGuard, otherGuardA))        
+        compGuardA = Guard(EqualsOperator(), FieldVariableOperand(self.comp, 'x'), 'A')  
+        self.addStateTransition(states['C'], Guard(AndOperator(), compGuardA, otherGuard))
+    
+class BStateTwoInstances(State):
+    
+    def __init__(self, name, comp, other):
+        State.__init__(self,  name)
+        self.comp = comp
+        self.other = other
+        
+    def __setupStateTransitions__(self, states):
+        leftOperand = FieldVariableOperand(self.comp, 'x')
+        rightOperand = 'A'   
+        compGuard = Guard(EqualsOperator(), leftOperand, rightOperand )   
+        leftOperand = FieldVariableOperand(self.other, 'x')
+        rightOperand = 'A'    
+        otherGuard = Guard(EqualsOperator(), leftOperand, rightOperand)   
+        self.addStateTransition(states['A'], Guard(AndOperator(), compGuard, otherGuard))
+        
+        otherGuardB = Guard(EqualsOperator(), leftOperand, 'B')  
+        self.addStateTransition(states['C'], Guard(AndOperator(), compGuard, otherGuardB))        
+        compGuardB = Guard(EqualsOperator(), FieldVariableOperand(self.comp, 'x'), 'B')  
+        self.addStateTransition(states['C'], Guard(AndOperator(), compGuardB, otherGuard))
+        
+class CStateTwoInstances(State):
+    
+    def __init__(self, name, comp, other):
+        State.__init__(self,  name)
+        self.comp = comp
+        self.other = other
+        
+    def __setupStateTransitions__(self, states):
+        leftOperand = FieldVariableOperand(self.comp, 'x')
+        rightOperand = 'A'   
+        compGuard = Guard(EqualsOperator(), leftOperand, rightOperand )   
+        leftOperand = FieldVariableOperand(self.other, 'x')
+        rightOperand = 'A'    
+        otherGuard = Guard(EqualsOperator(), leftOperand, rightOperand)   
+        self.addStateTransition(states['A'], Guard(AndOperator(), compGuard, otherGuard))
+        
+        leftOperand = FieldVariableOperand(self.comp, 'x')
+        rightOperand = 'B'   
+        compGuard = Guard(EqualsOperator(), leftOperand, rightOperand )   
+        leftOperand = FieldVariableOperand(self.other, 'x')
+        rightOperand = 'B'    
+        otherGuard = Guard(EqualsOperator(), leftOperand, rightOperand)   
+        self.addStateTransition(states['B'], Guard(AndOperator(), compGuard, otherGuard))
+        
+class AStateStatic(State):
+    def __init__(self, name, comp):
+        State.__init__(self,  name)
+        self.comp = comp
+        
+    def __setupStateTransitions__(self, states):
+        leftOperand = FieldVariableOperand(self.comp, 'x')
+        rightOperand = 'C'   
+        guard = Guard(EqualsOperator(), leftOperand, rightOperand )   
+        self.addStateTransition(states['C'], guard)
+        
+        leftOperand = FieldVariableOperand(self.comp, 'x')
+        rightOperand = 'B'   
+        guard = Guard(EqualsOperator(), leftOperand, rightOperand )     
+        self.addStateTransition(states['B'], guard)
+        
+class BStateStatic(State):
+    def __init__(self, name, comp):
+        State.__init__(self,  name)
+        self.comp = comp
+        
+    def __setupStateTransitions__(self, states):
+        leftOperand = FieldVariableOperand(self.comp, 'x')
+        rightOperand = 'C'   
+        guard = Guard(EqualsOperator(), leftOperand, rightOperand )   
+        self.addStateTransition(states['C'], guard)
+        
+        leftOperand = FieldVariableOperand(self.comp, 'x')
+        rightOperand = 'A'   
+        guard = Guard(EqualsOperator(), leftOperand, rightOperand )     
+        self.addStateTransition(states['A'], guard)
+        
+class CStateStatic(State):
+    def __init__(self, name, comp):
+        State.__init__(self,  name)
+        self.comp = comp
+        
+    def __setupStateTransitions__(self, states):
+        leftOperand = FieldVariableOperand(self.comp, 'x')
+        rightOperand = 'A'   
+        guard = Guard(EqualsOperator(), leftOperand, rightOperand )   
+        self.addStateTransition(states['A'], guard)
+        
+        leftOperand = FieldVariableOperand(self.comp, 'x')
+        rightOperand = 'B'   
+        guard = Guard(EqualsOperator(), leftOperand, rightOperand )     
+        self.addStateTransition(states['B'], guard)
+    
+    

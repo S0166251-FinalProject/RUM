@@ -1,0 +1,121 @@
+from rum.statemachine.Guards import *
+import inspect
+
+class State(object):
+    
+    def __init__(self, name):
+        self.__exit_guards__ = {}
+        self.__nextStates__ = []
+        self.name = name
+        
+    def getName(self):
+        return self.name
+    
+    def __setupStateTransitions__(self, states):
+        raise NotImplementedError('Classes which inherit from rum.States.State must implement __setupStateTransitions__(self, states)')
+    
+    '''add a new state transition to this state, with an optional guard'''        
+    def addStateTransition(self, state, guard = TrueGuard()):
+        if state not in  self.__nextStates__:
+            self.__nextStates__.append(state)   
+        self.__exit_guards__[guard] = state             
+
+    def evaluateExit(self, oldVars, newVars, component, method):
+        '''for each exit guard, check if it is satisfied, 
+        if a guard is satisfied, return the accompanying entry state'''
+        for guard in self.__exit_guards__:
+            if guard.evaluate(oldVars, newVars, component, method):
+                return self.__exit_guards__[guard]
+        return None
+    
+    def getNextStates(self):
+        return self.__nextStates__
+
+class StateMachine(object):
+
+    def __init__(self):
+        self.states = {}
+        self.currentState = None
+        self.__setupStates__()
+    
+    def __setupStates__(self):
+        raise NotImplementedError('Classes which inherit from rum.States.StateMachine must implement __setupStates__()')
+    
+    def setInitialState(self, name):
+        if self.currentState == None:
+            self.currentState = self.states[name]
+            for s in self.states.values():
+                s.__setupStateTransitions__(self.states)
+        else:
+            raise Exception('Cannot set another state as an initial state, an initial state has already been set and can only be set once')    
+    
+    def addState(self, state):
+        if not state.getName() in self.states.keys():
+            self.states[state.getName()] = state
+    
+    def removeStateByName(self, name):
+        if name in self.states.keys():
+            del self.states[name]
+    
+    def removeState(self, state):
+        if state in self.states.values():
+            name = ''
+            for n in self.states.keys():
+                if self.states[n] == state:
+                    name = n
+                    break;
+            del self.states[name]
+        
+    def getStates(self):
+        return self.states
+    
+    def getCurrentState(self):
+        return self.currentState
+    
+    def checkForTransition(self, old, new, component, method):
+        if self.currentState == None:
+            raise Exception('Initial State has not been set')          
+        nextState = self.currentState.evaluateExit(old, new, component, method)
+        if nextState != None and nextState in self.states.values():
+            self.currentState = nextState
+            '''print('transition made to state: '+nextState.getName())'''
+       
+    '''returns the state transitions which can be used to reach the 
+    desired state from the given state'''
+    def getStateRoutesFromTo(self, fromState, toState):        
+        paths = []
+        if fromState is toState:
+            return paths        
+        nextStates = fromState.getNextStates()
+        for state in nextStates:
+            path = [fromState, state]
+            temp = self.__getStateRoutesFromToHelper(state, toState, path)
+            if any(isinstance(el, list) for el in temp):                    
+                for p in temp:
+                    if len(p) > 0:
+                        paths.append(p)
+            elif len(temp) > 0:
+                paths.append(temp)    
+        return paths          
+        
+    def __getStateRoutesFromToHelper(self, fromState, toState, path):
+        paths = []
+        if fromState is toState:
+            return path
+        
+        nextStates = fromState.getNextStates()
+        for state in nextStates:
+            if not state in path:                
+                tempPath = list(path)
+                tempPath.append(state)
+                tempPaths = self.__getStateRoutesFromToHelper(state, toState, tempPath)
+                if any(isinstance(el, list) for el in tempPaths):                    
+                    for p in tempPaths:
+                        paths.append(p)
+                else:
+                    paths.append(tempPaths)
+        return paths
+    
+    
+
+        

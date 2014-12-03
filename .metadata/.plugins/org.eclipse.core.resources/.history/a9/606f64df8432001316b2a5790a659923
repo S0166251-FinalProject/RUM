@@ -1,0 +1,10 @@
+from springpython.aop import *
+
+class VisitInterceptor(MethodInterceptor):
+    def invoke(self, invocation):
+        results = "<Wrapped>" + invocation.proceed() + "</Wrapped>"
+        return results
+        'get the energy level before and after, calc difference'
+        'get the loc for and after, calc distance'
+        'calc new margin from this, adjust existing margin'
+        

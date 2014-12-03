@@ -1,0 +1,21 @@
+''' 
+    Lines of Code: 13
+    Max CC2: 1
+    LCOM4: 1
+    TCC:
+    CBO: 0
+    CF:    
+'''
+
+from Vehicle.Gearbox.AbstractGearbox import AbstractGearbox
+
+class Gearbox(AbstractGearbox): 
+
+    def __init__(self, maxGears):
+        AbstractGearbox.__init__(self, maxGears)
+        
+    def incGear(self):
+        self.gear = min(self.gear+1, self.maximumGear)
+        
+    def decGear(self):
+        self.gear = max(self.gear-1, 1)

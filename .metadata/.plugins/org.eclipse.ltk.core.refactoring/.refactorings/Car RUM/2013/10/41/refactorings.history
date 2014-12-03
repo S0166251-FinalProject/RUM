@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;Car RUM/Car/Engine.py&apos; to &apos;engine.py&apos;" description="Rename resource &apos;Engine.py&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Car/Engine.py" name="engine.py" stamp="1381320276741" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;Car RUM/Car/engine.py&apos; to &apos;Engine.py&apos;" description="Rename resource &apos;engine.py&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Car/engine.py" name="Engine.py" stamp="1381322304952" updateReferences="true"/>
+</session>

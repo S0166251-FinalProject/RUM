@@ -1,0 +1,114 @@
+class VehicleController(object):
+
+    '''CC2: 1'''  
+    def __init__(self, vehicle, world):
+        self.vehicle = vehicle
+        self.world = world
+
+    '''CC2: 1'''          
+    def engineOn(self):
+        self.vehicle.engineOn()
+
+    '''CC2: 1'''          
+    def engineOff(self):
+        self.vehicle.engineOff()
+
+    '''CC2: 1'''          
+    def incGear(self):
+        self.vehicle.incGear()
+        
+    '''CC2: 1'''          
+    def decGear(self):
+        self.vehicle.decGear()
+        
+    '''CC2: 1'''          
+    def stop(self):
+        self.vehicle.stop()
+        
+    '''CC2: 1'''          
+    def incThrottle(self, amount):
+        self.vehicle.incThrottle(amount)
+    
+    '''CC2: 1'''     
+    def decThrottle(self, amount):
+        self.vehicle.decThrottle(amount)
+        
+    '''CC2: 2'''             
+    def refuel(self):
+        amount = self.vehicle.getFueltank().canContainExtra()
+        location = self.world.getVehicleLocation(self.vehicle)
+        if(location.containsFuelStation()):
+            station = location.getFuelStation()
+            fuel = station.getFuel(amount)
+            self.vehicle.refuel(fuel)
+            
+    '''CC2: 3'''        
+    def loadPackage(self, package, building):
+        if self.world.getVehicleLocation(self.vehicle).containsBuilding(building):
+            if building.containsPackage(package):
+                building.removePackage(package)
+                self.vehicle.addPackage(package)
+                package.setCurrentlyLocatedIn(self.vehicle)
+                print('package '+package.__repr__()+' loaded into trunk')
+        
+    '''CC2: 3'''     
+    def unloadPackage(self, package, building):
+        if(self.world.getVehicleLocation(self.vehicle).containsBuilding(building)):
+            if self.vehicle.containsPackage(package):
+                self.vehicle.removePackage(package)
+                building.addPackage(package)
+                package.setCurrentlyLocatedIn(building)
+                print('package '+package.__repr__()+' delivered to destination')
+         
+    '''CC2: 5'''    
+    def pickup(self, package):
+        '''drive vehicle to location which contains the package
+        then load the package through loadPackage.
+        call driveTo on the vehicle to drive to the given location'''
+        if not package.delivered() and not package.inTransit() and self.vehicle.getTrunk().canAddCargo(package):
+            destination = package.getCurrentLocation()
+            self.driveTo(destination) 
+            if self.vehicle.getCurrentLocation() == destination:
+                self.loadPackage(package, package.containedIn())
+    
+    '''CC2: 5''' 
+    def deliver(self, package):
+        '''drive vehicle to the destination for the package
+        then load the package through loadPackage.
+        call driveTo on the vehicle to drive to the given location'''
+        if not package.delivered() and package.inTransit() and package.containedIn() == self.vehicle:
+            destination = package.getDestination()
+            self.driveTo(destination) 
+            if self.vehicle.getCurrentLocation() == destination:
+                self.unloadPackage(package, package.getDestinationBuilding())
+    
+    '''CC2: 5'''           
+    def driveTo(self, destination):          
+        routePlanner = self.vehicle.getRoutePlanner()
+        route = routePlanner.determineFastestRouteTo(destination)
+        self.vehicle.getRoutePlanner().setRoute(route)
+        self.engineOn()
+        while self.vehicle.getCurrentLocation() is not destination:
+            road = routePlanner.getNextRoad()
+            speed = self.vehicle.RUM.getSpeed()
+            if speed < road.getMaxSpeed():  
+                self.incThrottle(10)              
+                self.incGear()
+            speed = self.vehicle.RUM.getSpeed()
+            if speed > road.getMaxSpeed():
+                self.decThrottle(10)
+                self.decGear()
+            time = self.vehicle.driveTo(self.vehicle.getRoutePlanner().getNextStop())
+            consumption = self.vehicle.getPropulsion().RUM.getConsumption()
+            self.vehicle.consumeFuel(consumption*time/3600)
+        self.engineOff()
+            
+            
+            
+            
+        
+        
+        
+        
+
+        

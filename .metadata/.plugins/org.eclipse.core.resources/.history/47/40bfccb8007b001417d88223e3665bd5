@@ -1,0 +1,19 @@
+''' 
+    Lines of Code: 5
+    Max CC2: 1
+    LCOM4: 1
+    TCC:
+    CBO: 0
+    CF:    
+'''
+
+from World.Location.Buildings.Building import Building
+
+class FuelStation(Building):
+
+    def __init__(self, name, location):
+        Building.__init__(self, name, location)
+        
+    def getFuel(self, amount):
+        return amount
+        

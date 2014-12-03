@@ -1,0 +1,143 @@
+from abc import *
+import abc
+import types
+
+class RUM():
+    
+    def __init__(self, component):
+        self.component = component
+        self.transitions = []
+        
+    def methodNameCondition = 
+        
+    def switchMethods(self, original, replacement):
+        storage = getattr(self.component, original)
+        setattr(self.component, original, replacement) 
+        return storage
+    
+    def stateChangeCatcherBeforeAndAfter(self, method):
+        
+        def tempM(self, *args):
+            old = {}
+            for var in self.component.__dict__:
+                old[var] = getattr(self.component, var)       
+                
+            method(*args)
+            new = {}
+            for var in self.component.__dict__:
+                new[var] = getattr(self.component, var)
+            self.checkAndTransit(old, new, method.__name__)
+            
+        'add the new function to self as a bounded method'
+        setattr(self, method.__name__ ,types.MethodType(tempM, self))
+        
+        'replace the original method with the new function'        
+        setattr(self.component, method.__name__, getattr(self, method.__name__))
+      
+                    
+        '''
+        'create dynamic replacement function at runtime'
+        func_str = "def "
+        func_str += method.__name__+"BeforeAndAfterReplacement"
+        func_str += "(self, *args):"
+        func_str += "\n\t"
+        func_str += "old = {}"
+        func_str += "\n\t"
+        for var in self.component.__dict__:
+            func_str += "old['"+var+"'] = self.component."+var
+            func_str += "\n\t"
+        func_str += "self."+method.__name__+"(*args)"
+        func_str += "\n\t"
+        func_str += "new = {}"
+        func_str += "\n\t"
+        for var in self.component.__dict__:
+            func_str += "new['"+var+"'] = self.component."+var
+            func_str += "\n\t"
+        func_str += "self.checkAndTransit(old, new, '"+method.__name__+"')"
+        func_str += "\n"
+        
+        'use exec to define the function'
+        exec(func_str)
+        
+        'add the function as a method to this class'
+        set_self = "self."+method.__name__+"BeforeAndAfterReplacement"+" = types.MethodType("+method.__name__+"BeforeAndAfterReplacement, self)"
+        exec(set_self)
+        
+        'retrieve the original method'
+        temp = getattr(self.component, method.__name__)
+        
+        'replace it with the new function'
+        set_replacement = "setattr(self.component, '"+method.__name__+"', self."+method.__name__+"BeforeAndAfterReplacement)"
+        exec(set_replacement) 
+        
+        'add the original method to this class so it can be called by the function defined earlier'
+        set_original = "self."+method.__name__+"=temp"
+        exec(set_original)
+        '''
+     
+    def addStates(self, states):
+        self.states = states
+        self.state = None
+        
+    def setInitialState(self, state):
+        if self.state == None:
+            self.state = self.states.get(state)
+        
+    def addTransition(self, transition):
+        self.transitions.append(transition)
+        
+    def checkAndTransit(self, oldVars, newVars, methodName):
+        for transition in self.transitions:
+            if self.states.get(transition.currState) == self.state:
+                if transition.shouldTransit(oldVars, newVars, methodName):
+                    self.state = self.states.get(transition.nextState)
+                    return
+        
+class Transition():
+    
+    def __init__(self, currState, nextState, conditions):
+        self.currState = currState
+        self.nextState = nextState
+        self.conditions = conditions
+        
+    'returns true if the current state warrants a transit to the nextState'
+    def shouldTransit(self, oldVars, newVars, methodName):
+        transit = True
+        for condition in self.conditions:
+            transit &= condition.validates(oldVars, newVars, methodName)
+        return transit
+   
+class Condition():    
+    
+    def __init__(self, expression):
+        self.expression = expression
+    
+    def validates(self, oldVariables, newVariables, methodName):
+        expr = ""
+        expr += self.expression
+        expr = self.loadVar(expr, oldVariables, "old:")
+        expr = self.loadVar(expr, newVariables, "new:")
+        expr = self.loadMethodNames(expr, methodName)     
+        return eval(expr)
+    
+    def loadVar(self, expr, variables, keyword):
+        'search for keyword (old: or new:), replace it with the corresponding variable'
+        result = ""
+        words = expr.split()
+        for word in words:
+            if word.startswith(keyword):
+                result += variables.get(word.replace(keyword, "")).__str__()+" "
+            else:
+                result += word+" "
+        return result
+                
+    def loadMethodNames(self, expr, methodName):
+        'search for methodName:, replace it with the methodName variable'
+        result = ""
+        words = expr.split()
+        for word in words:
+            if word.startswith("methodName:"):
+                result += word.replace("methodName:", "'"+methodName+"'") +" "
+            else:
+                result += word+" "
+        return result

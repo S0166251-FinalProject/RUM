@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete resource &apos;Python Vehicle example/pynocle-0.3.2&apos;" deleteContents="false" description="Delete resource &apos;Python Vehicle example/pynocle-0.3.2&apos;" element1="/Python Vehicle example/pynocle-0.3.2" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1403094966078"/>
+</session>

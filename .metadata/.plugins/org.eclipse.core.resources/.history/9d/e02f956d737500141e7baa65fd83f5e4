@@ -1,0 +1,75 @@
+from rum.statemachine.Guards import *
+import operator
+from rum.statemachine.Operands import *
+from rum.statemachine.Query import *
+
+'''-----operators-----'''  
+
+class AbstractOperator(object):
+    
+    def __init__(self, operator, description):
+        self.op = operator
+        self.description = description
+        
+    def execute(self):
+        raise NotImplementedError('classes which inherit from AbstractOperator must implement the execute method')
+   
+class BinaryOperator(AbstractOperator): 
+    
+    def __init__(self, operator, description):
+        AbstractOperator.__init__(self, operator, description)
+    
+    def execute(self, left, right):        
+        if self.op == None:
+            raise Exception('A BinaryOperator must be instantiated with an executable operator object')
+        return self.op(left, right) 
+    
+class ArithmeticOperator(BinaryOperator):
+    
+    def __init__(self, op, description):
+        BinaryOperator.__init__(self, op, description) 
+           
+class BooleanOperator(BinaryOperator):
+    
+    def __init__(self, op, description):
+        BinaryOperator.__init__(self, op, description) 
+    
+class EqualsOperator(BooleanOperator):
+    
+    def __init__(self):
+        BooleanOperator.__init__(self, operator.eq, "==")
+        
+class AndOperator(BooleanOperator):
+    
+    def __init__(self):
+        BooleanOperator.__init__(self, operator.and_, "&&")
+
+class OrOperator(BooleanOperator):
+    
+    def __init__(self):
+        BooleanOperator.__init__(self, operator.or_, "||")
+    
+class NotEqualsOperator(BooleanOperator):
+    
+    def __init__(self):
+        BooleanOperator.__init__(self, operator.ne, "!=")
+    
+class SubstractionOperator(ArithmeticOperator):
+    def __init__(self):
+        ArithmeticOperator.__init__(self, operator.sub, "-")
+    
+class AdditionOperator(ArithmeticOperator):
+    def __init__(self):
+        ArithmeticOperator.__init__(self, operator.add, "+")     
+    
+class MultiplicationOperator(ArithmeticOperator):
+    def __init__(self):
+        ArithmeticOperator.__init__(self, operator.mul, "*")
+
+class GreaterThanOperator(BooleanOperator):
+    def __init__(self):
+        BooleanOperator.__init__(self, operator.gt)
+    
+class SmallerThanOperator(BooleanOperator):
+    def __init__(self):
+        BooleanOperator.__init__(self, operator.lt)

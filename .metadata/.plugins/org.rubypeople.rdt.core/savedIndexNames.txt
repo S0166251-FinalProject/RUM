@@ -1,0 +1,10 @@
+INDEX VERSION 1.116+C:\Users\Firion Corodix\Documents\UT\Research Topics\.metadata\.plugins\org.rubypeople.rdt.core
+4146739265.index
+3293852830.index
+1378316651.index
+3494300355.index
+954296187.index
+3809051985.index
+2040715501.index
+1989397231.index
+999549938.index

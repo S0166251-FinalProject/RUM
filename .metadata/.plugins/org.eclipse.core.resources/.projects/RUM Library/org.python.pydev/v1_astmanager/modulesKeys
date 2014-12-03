@@ -1,0 +1,22 @@
+MODULES_MANAGER_V2
+rum.Interceptor|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\rum\Interceptor.py
+rum.Interjector|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\rum\Interjector.py
+rum.Query|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\rum\Query.py
+rum.RUM|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\rum\RUM.py
+rum.__init__|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\rum\__init__.py
+rum.statemachine.Guards|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\rum\statemachine\Guards.py
+rum.statemachine.Operands|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\rum\statemachine\Operands.py
+rum.statemachine.Operators|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\rum\statemachine\Operators.py
+rum.statemachine.States|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\rum\statemachine\States.py
+rum.statemachine.TypedGuards|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\rum\statemachine\TypedGuards.py
+rum.statemachine.__init__|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\rum\statemachine\__init__.py
+test.BaseTest|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\test\BaseTest.py
+test.__init__|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\test\__init__.py
+test.interceptor.GuardTests|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\test\interceptor\GuardTests.py
+test.interceptor.InterceptorTests|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\test\interceptor\InterceptorTests.py
+test.interceptor.OperandTests|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\test\interceptor\OperandTests.py
+test.interceptor.__init__|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\test\interceptor\__init__.py
+test.interjector.InterjectorTests|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\test\interjector\InterjectorTests.py
+test.interjector.__init__|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\test\interjector\__init__.py
+test.query.QueryTests|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\test\query\QueryTests.py
+test.query.__init__|C:\Users\Firion Corodix\Documents\GitHub\RUM\RUM Library\test\query\__init__.py

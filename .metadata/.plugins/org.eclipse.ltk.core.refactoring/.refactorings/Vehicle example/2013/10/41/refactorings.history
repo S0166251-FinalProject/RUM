@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;Vehicle example/vehicle.py&apos; to &apos;vehiclebackup.py&apos;" description="Rename resource &apos;vehicle.py&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="vehicle.py" name="vehiclebackup.py" stamp="1381502245235" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;Vehicle example/vehiclebackup.py&apos; to &apos;vehicle2.py&apos;" description="Rename resource &apos;vehiclebackup.py&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="vehiclebackup.py" name="vehicle2.py" stamp="1381504056185" updateReferences="true"/>
+</session>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<libraryInfos>
+<libraryInfo home="D:\Program Files\Ruby200-x64" version="2.0.0" vmTypeId="org.rubypeople.rdt.launching.StandardVMType">
+<bootpath>
+<entry path="D:/Program Files/Ruby200-x64/lib/ruby/site_ruby/2.0.0"/>
+<entry path="D:/Program Files/Ruby200-x64/lib/ruby/site_ruby/2.0.0/x64-msvcrt"/>
+<entry path="D:/Program Files/Ruby200-x64/lib/ruby/site_ruby"/>
+<entry path="D:/Program Files/Ruby200-x64/lib/ruby/vendor_ruby/2.0.0"/>
+<entry path="D:/Program Files/Ruby200-x64/lib/ruby/vendor_ruby/2.0.0/x64-msvcrt"/>
+<entry path="D:/Program Files/Ruby200-x64/lib/ruby/vendor_ruby"/>
+<entry path="D:/Program Files/Ruby200-x64/lib/ruby/2.0.0"/>
+<entry path="D:/Program Files/Ruby200-x64/lib/ruby/2.0.0/x64-mingw32"/>
+</bootpath>
+</libraryInfo>
+<libraryInfo home="D:\eclipse Research Topics\configuration\org.eclipse.osgi\bundles\267\1\.cp" version="1.8.5" vmTypeId="org.rubypeople.rdt.launching.JRubyVMType">
+<bootpath>
+<entry path="D:/eclipse Research Topics/configuration/org.eclipse.osgi/bundles/267/1/.cp/lib/ruby/site_ruby/1.8"/>
+<entry path="D:/eclipse Research Topics/configuration/org.eclipse.osgi/bundles/267/1/.cp/lib/ruby/site_ruby"/>
+<entry path="D:/eclipse Research Topics/configuration/org.eclipse.osgi/bundles/267/1/.cp/lib/ruby/1.8"/>
+</bootpath>
+</libraryInfo>
+</libraryInfos>
