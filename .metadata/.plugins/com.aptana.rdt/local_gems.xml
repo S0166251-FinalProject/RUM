@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gems>
+	<gem>
+		<name>json</name>
+		<version>1.7.7</version>
+		<description>minitest (4.3.2) psych (2.0.0) rake (0.9.6) rdoc (4.0.0) test-unit (2.0.0.0)</description>
+		<platform>ruby</platform>
+	</gem>
+</gems>
