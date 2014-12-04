@@ -1,12 +1,3 @@
-''' 
-    Lines of Code: 27
-    Max CC2: 2
-    LCOM4:
-    TCC:
-    CBO: 2
-    CF:    
-'''
-
 import abc
 from abc import ABCMeta
 from World.Weather.Weather import Weather

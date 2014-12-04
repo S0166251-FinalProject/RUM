@@ -1,12 +1,3 @@
-''' 
-    Lines of Code: 91
-    Max CC2: 1
-    LCOM4: 1
-    TCC:
-    CBO: 8
-    CF:    
-'''
-
 from World.World import World
 from World.Location.Location import Location
 from World.Location.Buildings.FuelStation import FuelStation

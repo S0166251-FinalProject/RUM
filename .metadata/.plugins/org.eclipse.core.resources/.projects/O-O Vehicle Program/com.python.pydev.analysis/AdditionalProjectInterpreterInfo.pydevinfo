@@ -2,70 +2,7 @@
 -- START DISKCACHE
 C:\Users\Firion Corodix\Documents\GitHub\RUM\.metadata\.plugins\org.eclipse.core.resources\.projects\O-O Vehicle Program\com.python.pydev.analysis\v1_indexcache
 .v1_indexcache
-World.AbstractWorld|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\AbstractWorld.py
-Controller.VehicleController|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Controller\VehicleController.py
-Vehicle.Propulsion.Optimizers.AbstractEngineOptimizer|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\Optimizers\AbstractEngineOptimizer.py
-Vehicle.Gearbox.Strategy.ManualGearboxStrategy|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Gearbox\Strategy\ManualGearboxStrategy.py
-World.World|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\World.py
-Vehicle.Propulsion.Strategy.ManualPropulsionStrategy|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\Strategy\ManualPropulsionStrategy.py
-Vehicle.Cargo.AbstractTrunk|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Cargo\AbstractTrunk.py
-Vehicle.Gearbox.AbstractGearbox|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Gearbox\AbstractGearbox.py
-Vehicle.Propulsion.Propulsion|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\Propulsion.py
-World.packages.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\packages\__init__.py
-Vehicle.Gearbox.Strategy.PerformanceSpeedGearboxStrategy|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Gearbox\Strategy\PerformanceSpeedGearboxStrategy.py
-Vehicle.Gearbox.Strategy.EfficiencyGearboxStrategy|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Gearbox\Strategy\EfficiencyGearboxStrategy.py
-Vehicle.Fueltank.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Fueltank\__init__.py
-Vehicle.Gearbox.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Gearbox\__init__.py
-Vehicle.Propulsion.Optimizers.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\Optimizers\__init__.py
-World.Location.Buildings.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Location\Buildings\__init__.py
-World.WorldFactory|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\WorldFactory.py
-World.Location.Buildings.AbstractBuilding|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Location\Buildings\AbstractBuilding.py
-Vehicle.Propulsion.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\__init__.py
-World.Location.Buildings.Building|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Location\Buildings\Building.py
-World.Road.Road|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Road\Road.py
-Vehicle.Propulsion.Optimizers.AbstractThrottleOptimizer|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\Optimizers\AbstractThrottleOptimizer.py
-World.Location.Location|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Location\Location.py
-Vehicle.Propulsion.AbstractPropulsion|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\AbstractPropulsion.py
-Vehicle.Driver.CheapDriver|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Driver\CheapDriver.py
-Vehicle.Gearbox.Optimizer.AbstractGearOptimizer|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Gearbox\Optimizer\AbstractGearOptimizer.py
-Vehicle.Propulsion.Optimizers.EfficientThrottleOptimizer|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\Optimizers\EfficientThrottleOptimizer.py
-World.Weather.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Weather\__init__.py
-World.Road.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Road\__init__.py
-Vehicle.Propulsion.Strategy.EfficiencyPropulsionStrategy|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\Strategy\EfficiencyPropulsionStrategy.py
-Vehicle.Driver.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Driver\__init__.py
-Vehicle.Propulsion.Optimizers.EngineOptimizer|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\Optimizers\EngineOptimizer.py
-Vehicle.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\__init__.py
-World.Weather.AbstractWeather|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Weather\AbstractWeather.py
-Vehicle.Propulsion.Strategy.PerformanceSpeedPropulsionStrategy|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\Strategy\PerformanceSpeedPropulsionStrategy.py
-Vehicle.Gearbox.Optimizer.AutomaticGearboxOptimizer|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Gearbox\Optimizer\AutomaticGearboxOptimizer.py
-World.packages.PackageManager|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\packages\PackageManager.py
-Vehicle.RoutePlanner|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\RoutePlanner.py
-Vehicle.Gearbox.Strategy.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Gearbox\Strategy\__init__.py
-World.Location.Buildings.FuelStation|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Location\Buildings\FuelStation.py
-Vehicle.Fueltank.AbstractFueltank|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Fueltank\AbstractFueltank.py
-Vehicle.Gearbox.Gearbox|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Gearbox\Gearbox.py
-Vehicle.Driver.StandardDriver|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Driver\StandardDriver.py
-Vehicle.Cargo.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Cargo\__init__.py
-Vehicle.Propulsion.Strategy.AbstractPropulsionStrategy|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\Strategy\AbstractPropulsionStrategy.py
-Vehicle.Driver.SpeedyDriver|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Driver\SpeedyDriver.py
-Vehicle.Gearbox.Optimizer.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Gearbox\Optimizer\__init__.py
-Vehicle.Gearbox.Optimizer.GearOptimizer|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Gearbox\Optimizer\GearOptimizer.py
-Vehicle.Propulsion.Optimizers.SpeedyThrottleOptimizer|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\Optimizers\SpeedyThrottleOptimizer.py
-Vehicle.Gearbox.Strategy.AbstractGearboxStrategy|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Gearbox\Strategy\AbstractGearboxStrategy.py
-Vehicle.VehicleFactory|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\VehicleFactory.py
-World.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\__init__.py
-World.Location.AbstractLocation|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Location\AbstractLocation.py
-World.Road.AbstractRoad|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Road\AbstractRoad.py
-Controller.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Controller\__init__.py
-Vehicle.Propulsion.Strategy.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Propulsion\Strategy\__init__.py
-Vehicle.AbstractVehicle|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\AbstractVehicle.py
-World.Location.__init__|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Location\__init__.py
 World.Weather.Weather|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\Weather\Weather.py
-Vehicle.Cargo.Trunk|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Cargo\Trunk.py
-World.packages.Package|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\World\packages\Package.py
-Vehicle.Driver.AbstractDriver|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Driver\AbstractDriver.py
-Vehicle.DeliveryVehicle|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\DeliveryVehicle.py
-Vehicle.Fueltank.Fueltank|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Vehicle Program\Vehicle\Fueltank\Fueltank.py
 -- END DISKCACHE
 -- START DICTIONARY
 136
@@ -84,7 +21,7 @@ Vehicle.Fueltank.Fueltank|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Veh
 5=World.Location.Buildings.AbstractBuilding
 18=World.Location.Buildings.Building
 38=World.Road.Road
-128=RoutePlanner.setPackageManager
+129=RoutePlanner.setPackageManager
 2=Vehicle.Propulsion.Optimizers.AbstractThrottleOptimizer
 107=RoutePlanner.setCurrentLocation
 92=AbstractRoad
@@ -92,7 +29,7 @@ Vehicle.Fueltank.Fueltank|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Veh
 62=AbstractEngineOptimizer
 20=Vehicle.Driver.CheapDriver
 80=EfficientDriver
-22=Vehicle.Propulsion.Optimizers.EfficientThrottleOptimizer
+23=Vehicle.Propulsion.Optimizers.EfficientThrottleOptimizer
 84=AbstractVehicle
 64=VehicleFactory
 130=RoutePlanner.setRoute
@@ -119,7 +56,7 @@ Vehicle.Fueltank.Fueltank|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Veh
 13=Vehicle.Gearbox.Strategy.AbstractGearboxStrategy
 113=AbstractEngineOptimizer.__init__
 73=EngineOptimizer
-129=PackageManager.__init__
+128=PackageManager.__init__
 75=Road
 11=World.Road.AbstractRoad
 122=AbstractBuilding.__init__
@@ -131,10 +68,10 @@ Vehicle.Fueltank.Fueltank|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Veh
 109=Gearbox.__init__
 67=AbstractTrunk
 83=AbstractDriver
-120=AbstractGearbox.__init__
+118=AbstractGearbox.__init__
 97=Gearbox
 112=AbstractRoad.__init__
-121=AbstractGearboxStrategy.__init__
+119=AbstractGearboxStrategy.__init__
 65=AbstractWorld
 46=Controller.VehicleController
 32=Vehicle.Gearbox.Strategy.ManualGearboxStrategy
@@ -158,7 +95,7 @@ Vehicle.Fueltank.Fueltank|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Veh
 105=Package.setCurrentlyLocatedIn
 81=EfficientThrottleptimizer
 102=AbstractLocation.__init__
-114=AbstractVehicle.__init__
+115=AbstractVehicle.__init__
 76=AbstractThrottleOptimizer
 29=World.Location.Location
 61=VehicleController
@@ -166,7 +103,7 @@ Vehicle.Fueltank.Fueltank|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Veh
 71=DeliveryVehicle
 10=Vehicle.Gearbox.Optimizer.AbstractGearOptimizer
 69=ManualGearboxStrategy
-23=Vehicle.Propulsion.Strategy.EfficiencyPropulsionStrategy
+22=Vehicle.Propulsion.Strategy.EfficiencyPropulsionStrategy
 111=Weather.determineWeather
 24=Vehicle.Propulsion.Optimizers.EngineOptimizer
 35=World.packages.PackageManager
@@ -190,18 +127,18 @@ Vehicle.Fueltank.Fueltank|0|C:\Users\Firion Corodix\Documents\GitHub\RUM\O-O Veh
 136=VehicleController.__init__
 53=PerformanceSpeedGearboxStrategy
 134=AbstractThrottleOptimizer.__init__
-118=AbstractPropulsionStrategy.__init__
+120=AbstractPropulsionStrategy.__init__
 98=Weather
 16=Vehicle.AbstractVehicle
 100=AutomaticGearboxOptimizer.__decGear__
 133=GearOptimizer.__init__
 9=Vehicle.Driver.AbstractDriver
-116=Fueltank.consumeFuel
+117=Fueltank.consumeFuel
 55=EfficiencyGearboxStrategy
-115=Fueltank.refuel
+116=Fueltank.refuel
 19=Vehicle.DeliveryVehicle
-117=AbstractFueltank.__init__
-119=AbstractGearOptimizer.__init__
+114=AbstractFueltank.__init__
+121=AbstractGearOptimizer.__init__
 135=testObject.A
 25=Vehicle.Fueltank.Fueltank
 96=Location
@@ -212,7 +149,7 @@ abs|16|AbstractTrunk!9@AbstractThrottleOptimizer!17@AbstractEngineOptimizer!25@A
 aut|1|AutomaticGearboxOptimizer!137@
 bui|1|Building!145@
 del|1|DeliveryVehicle!153@
-eff|4|EfficientDriver!161@EfficiencyGearboxStrategy!169@EfficientThrottleptimizer!177@EfficiencyPropulsionStrategy!185@
+eff|4|EfficientDriver!161@EfficiencyGearboxStrategy!169@EfficiencyPropulsionStrategy!177@EfficientThrottleptimizer!185@
 eng|1|EngineOptimizer!193@
 fue|2|Fueltank!201@FuelStation!209@
 gea|2|GearOptimizer!217@Gearbox!225@
@@ -239,9 +176,9 @@ wra|1|Wrappy!345@
 A|1|A!50&346@
 __a|1|__alreadyVisited!51&314@
 __c|1|__createWrapper__!52&346@
-__d|7|__determineOptimalCombination__!53&290@__determineOptimalCombination__!54&186@__determineOptimalCombination__!55&170@__determineOptimalGearThrottleCombination__!56&34@__determineOptimalCombination__!57&266@__determineOptimalGearThrottleCombination__!58&106@__decGear__!59&138@
+__d|7|__determineOptimalCombination__!53&290@__determineOptimalCombination__!54&178@__determineOptimalCombination__!55&170@__determineOptimalGearThrottleCombination__!56&34@__determineOptimalCombination__!57&266@__determineOptimalGearThrottleCombination__!58&106@__decGear__!59&138@
 __g|4|__getShortestRoute__!51&314@__getRoutesFromTo!51&314@__getFastestRoute!51&314@__getRoutesFromToHelper!51&314@
-__i|48|__init__!60&298@__init__!61&370@__init__!62&26@__init__!63&394@__init__!64&362@__init__!65&114@__init__!66&250@__init__!67&10@__init__!68&58@__init__!69&258@__init__!70&98@__init__!71&154@__init__!58&106@__init__!72&42@__init__!57&266@__init__!54&186@__init__!73&194@__init__!51&314@__init__!74&282@__incGear__!59&138@__init__!75&306@__init__!76&18@__init__!77&146@__init__!78&202@__init__!79&322@__init__!80&162@__init__!81&178@__init__!82&386@__init__!83&74@__init__!84&130@__init__!85&354@__init__!86&338@__init__!87&50@__init__!88&330@__init__!89&274@__init__!56&34@__init__!55&170@__init__!90&218@__init__!91&210@__init__!53&290@__init__!92&90@__init__!93&66@__init__!94&82@__init__!95&122@__init__!96&234@__init__!59&138@__init__!97&226@__init__!98&378@
+__i|48|__init__!60&298@__init__!61&370@__init__!62&26@__init__!63&394@__init__!64&362@__init__!65&114@__init__!66&250@__init__!67&10@__init__!68&58@__init__!69&258@__init__!70&98@__init__!71&154@__init__!58&106@__init__!72&42@__init__!57&266@__init__!54&178@__init__!73&194@__init__!51&314@__init__!74&282@__incGear__!59&138@__init__!75&306@__init__!76&18@__init__!77&146@__init__!78&202@__init__!79&322@__init__!80&162@__init__!81&186@__init__!82&386@__init__!83&74@__init__!84&130@__init__!85&354@__init__!86&338@__init__!87&50@__init__!88&330@__init__!89&274@__init__!56&34@__init__!55&170@__init__!90&218@__init__!91&210@__init__!53&290@__init__!92&90@__init__!93&66@__init__!94&82@__init__!95&122@__init__!96&234@__init__!59&138@__init__!97&226@__init__!98&378@
 __m|14|__metaclass__!83&75@__metaclass__!70&99@__metaclass__!95&123@__metaclass__!72&43@__metaclass__!93&67@__metaclass__!68&59@__metaclass__!87&51@__metaclass__!62&27@__metaclass__!94&83@__metaclass__!92&91@__metaclass__!84&131@__metaclass__!67&11@__metaclass__!65&115@__metaclass__!76&19@
 __r|2|__repr__!75&306@__repr__!96&234@
 __s|1|__setattr__!50&346@
@@ -250,64 +187,64 @@ all|2|allPackagesAreDelivered!51&314@allPackagesAreDelivered!74&282@
 atd|1|atDestination!51&314@
 aut|3|automatic!99&139@automatic!100&139@automatic!101&139@
 bui|1|buildings!102&123@
-can|4|canAddCargo!67&10@canContainExtra!93&66@canContainExtra!78&202@canAddCargo!85&354@
+can|4|canContainExtra!93&66@canContainExtra!78&202@canAddCargo!67&10@canAddCargo!85&354@
 car|1|cargo!103&11@
 con|11|containsPackage!67&10@containsPackage!85&354@containsBuilding!96&234@containedIn!89&274@containsFuelStation!95&122@consumeFuel!78&202@containsPackage!72&42@consumeFuel!84&130@consumeFuel!93&66@containsVehicle!95&122@containsPackage!84&130@
-cre|3|CreateWorld!82&386@CreateAndDeployPackages!82&386@CreateSpeedyVehicle!64&362@
-cur|5|currentlyContainedIn!104&275@currentlyContainedIn!105&275@currentLocation!106&315@currentLocation!107&315@currentlyUsedVolume!103&11@
+cre|3|CreateSpeedyVehicle!64&362@CreateWorld!82&386@CreateAndDeployPackages!82&386@
+cur|5|currentlyContainedIn!104&275@currentlyContainedIn!105&275@currentlyUsedVolume!103&11@currentLocation!106&315@currentLocation!107&315@
 dae|1|daemon!108&139@
-dec|19|decThrottle!61&370@decThrottle!81&178@decGear!90&218@decGear!84&130@decThrottle!60&298@decThrottle!76&18@decGear!69&258@decThrottle!84&130@decGear!68&58@decGear!55&170@decThrottle!57&266@decThrottle!70&98@decGear!53&290@decThrottle!88&330@decGear!61&370@decGear!94&82@decThrottle!66&250@decGear!97&226@decThrottle!54&186@
+dec|19|decThrottle!61&370@decThrottle!81&186@decGear!90&218@decGear!84&130@decThrottle!60&298@decThrottle!76&18@decGear!69&258@decThrottle!84&130@decGear!68&58@decGear!55&170@decThrottle!57&266@decThrottle!70&98@decGear!53&290@decThrottle!88&330@decGear!61&370@decGear!94&82@decThrottle!66&250@decGear!97&226@decThrottle!54&178@
 del|2|deliver!61&370@delivered!89&274@
 des|1|destinationBuilding!104&275@
-det|11|determineDesiredGear!80&162@determineDesiredThrottle!79&322@determineWeather!87&50@determineDesiredThrottle!80&162@determineDesiredThrottle!81&178@determineWeather!98&378@determineFastestRouteFromTo!51&314@determineDesiredGear!79&322@determineFastestRouteTo!51&314@determineDesiredThrottle!88&330@determineResistanceForRoad!63&394@
+det|11|determineDesiredGear!80&162@determineDesiredThrottle!79&322@determineWeather!87&50@determineDesiredThrottle!80&162@determineDesiredThrottle!81&186@determineWeather!98&378@determineFastestRouteFromTo!51&314@determineDesiredGear!79&322@determineFastestRouteTo!51&314@determineDesiredThrottle!88&330@determineResistanceForRoad!63&394@
 dif|1|differentialRatio!109&227@
-dir|5|direction_side!87&51@direction_front!87&51@direction_back!87&51@direction!110&51@direction!111&379@
+dir|5|direction_front!87&51@direction_back!87&51@direction!110&51@direction_side!87&51@direction!111&379@
 dis|1|distance!112&91@
 dri|9|driveTo!80&162@driveVehicleTo!65&114@driveTo!71&154@driveTo!61&370@driveTo!79&322@drive!86&338@driveTo!84&130@driveTo!83&74@driveVehicleTo!63&394@
 emp|2|empty!78&202@empty!93&66@
 eng|13|engineOff!61&370@engineOff!62&26@engineOn!73&194@engineOff!84&130@engineOn!61&370@engineOn!62&26@engineOff!70&98@engineOn!84&130@engineOff!73&194@engine!113&27@engineOn!60&298@engineOff!60&298@engineOn!70&98@
-fin|2|findConnection!63&394@findConnection!65&114@
-fue|4|fueltank!114&131@fuelLevel!115&203@fuelLevel!116&203@fuelLevel!117&67@
+fin|2|findConnection!65&114@findConnection!63&394@
+fue|4|fuelLevel!114&67@fueltank!115&131@fuelLevel!116&203@fuelLevel!117&203@
 ful|2|full!93&66@full!78&202@
-gea|6|gearbox!108&139@gearbox!118&35@gearbox!119&83@gear!120&59@gearbox!121&107@gearbox!114&131@
-get|63|getFastRouteToPickupPackage!51&314@getNextStop!51&314@getSteepness!92&90@getThrottle!60&298@getNextRoadSteepness!51&314@getSpeed!84&130@getMinSpeed!92&90@getCurrentLocation!51&314@getRotation!97&226@getFuelStation!95&122@getNearestUndeliveredPackage!51&314@getPackages!74&282@getUndeliveredPackages!74&282@getMaxSpeed!75&306@getConsumption!70&98@getDirection!87&50@getRoutePlanner!84&130@getRotation!68&58@getVehicleLocation!65&114@getCurrentGear!68&58@getLocation!84&130@getCurrentLocation!89&274@getFuelTank!84&130@getRPM!70&98@getWorld!51&314@getBuilding!95&122@getResistance!87&50@getCargoWeight!67&10@getCargoWeight!85&354@getFastRouteToDeliverPackage!51&314@getMaxSpeed!92&90@getCurrentLocation!84&130@getBuildings!95&122@getResistance!98&378@getWeight!89&274@getSpeed!71&154@getMaxGears!68&58@getThrottle!70&98@getBuilding!96&234@getVolume!89&274@getName!72&42@getSteepness!63&394@getNearestPackage!51&314@getWheelCircumference!84&130@getConsumption!60&298@getGearbox!84&130@getDestination!89&274@getDistance!92&90@getMinSpeed!75&306@getWeather!63&394@getLocations!63&394@getRPM!60&298@getNextRoad!51&314@getTrunk!84&130@getSteepness!75&306@getAvailableRoadsAt!63&394@getLocation!77&146@getPropulsion!84&130@getPackage!74&282@getFuel!91&210@GetRequiredRPMFor!68&58@getDistance!75&306@getDestinationBuilding!89&274@
-inc|19|incGear!53&290@incGear!90&218@incThrottle!57&266@incThrottle!84&130@incGear!55&170@incGear!68&58@incThrottle!70&98@incThrottle!66&250@incGear!69&258@incThrottle!60&298@incThrottle!61&370@incGear!94&82@incGear!61&370@incThrottle!81&178@incThrottle!88&330@incGear!84&130@incThrottle!54&186@incThrottle!76&18@incGear!97&226@
+gea|6|gear!118&59@gearbox!108&139@gearbox!119&107@gearbox!120&35@gearbox!115&131@gearbox!121&83@
+get|63|getFastRouteToPickupPackage!51&314@getNextStop!51&314@getSteepness!92&90@getThrottle!60&298@getNextRoadSteepness!51&314@getSpeed!84&130@getMinSpeed!92&90@getCurrentLocation!51&314@getRotation!97&226@getFuelStation!95&122@getNearestUndeliveredPackage!51&314@getPackages!74&282@getUndeliveredPackages!74&282@getMaxSpeed!75&306@getConsumption!70&98@getDirection!87&50@getRoutePlanner!84&130@getRotation!68&58@getVehicleLocation!65&114@getCurrentGear!68&58@getLocation!84&130@getCurrentLocation!89&274@getFuelTank!84&130@getRPM!70&98@getWorld!51&314@getBuilding!95&122@getResistance!87&50@getCargoWeight!67&10@getCargoWeight!85&354@getFastRouteToDeliverPackage!51&314@getMaxSpeed!92&90@getCurrentLocation!84&130@getBuildings!95&122@getWeight!89&274@getResistance!98&378@getSpeed!71&154@getMaxGears!68&58@getThrottle!70&98@getBuilding!96&234@getVolume!89&274@getName!72&42@getSteepness!63&394@getNearestPackage!51&314@getWheelCircumference!84&130@getConsumption!60&298@getGearbox!84&130@getDestination!89&274@getDistance!92&90@getMinSpeed!75&306@getWeather!63&394@getLocations!63&394@getRPM!60&298@getNextRoad!51&314@getTrunk!84&130@getSteepness!75&306@getAvailableRoadsAt!63&394@getLocation!77&146@getPropulsion!84&130@getPackage!74&282@getFuel!91&210@GetRequiredRPMFor!68&58@getDistance!75&306@getDestinationBuilding!89&274@
+inc|19|incGear!53&290@incGear!90&218@incThrottle!57&266@incThrottle!84&130@incGear!55&170@incGear!68&58@incThrottle!70&98@incThrottle!66&250@incGear!69&258@incThrottle!60&298@incThrottle!61&370@incGear!94&82@incGear!61&370@incThrottle!81&186@incThrottle!88&330@incGear!84&130@incThrottle!54&178@incThrottle!76&18@incGear!97&226@
 int|2|inTransit!89&274@interceptInvocation!52&346@
 iso|1|isOn!70&98@
 loa|1|loadPackage!61&370@
 loc|2|location!122&43@locations!123&115@
-max|6|max_strength!87&51@maximumGear!120&59@maxVolume!103&11@maxThrottle!124&99@maxFuel!117&67@maxSpeed!112&91@
+max|6|max_strength!87&51@maximumGear!118&59@maxVolume!103&11@maxThrottle!124&99@maxFuel!114&67@maxSpeed!112&91@
 min|2|minThrottle!124&99@minSpeed!112&91@
-nam|4|name!122&43@name!114&131@name!102&123@name!112&91@
+nam|4|name!122&43@name!115&131@name!102&123@name!112&91@
 nex|2|nextRoad!106&315@nextRoad!125&315@
-on|3|on!124&99@on!126&299@on!127&299@
-pac|3|packageManager!128&315@packages!122&43@packages!129&283@
+on|3|on!126&299@on!127&299@on!124&99@
+pac|3|packages!122&43@packages!128&283@packageManager!129&315@
 pic|1|pickup!61&370@
-pro|4|propulsion!114&131@processManualSwitch!59&138@propulsion!121&107@propulsion!118&35@
+pro|4|propulsion!119&107@propulsion!120&35@propulsion!115&131@processManualSwitch!59&138@
 rat|1|ratio!109&227@
-ref|4|refuel!84&130@refuel!93&66@refuel!61&370@refuel!78&202@
+ref|4|refuel!61&370@refuel!84&130@refuel!93&66@refuel!78&202@
 reg|2|regulatePropulsion!79&322@regulatePropulsion!80&162@
 rem|9|removePackage!72&42@remainingVolume!67&10@remainingVolume!85&354@removeVehicle!95&122@removeCargo!67&10@removeVehicle!96&234@removePackage!77&146@removePackage!84&130@removeCargo!85&354@
 roa|2|roadNetwork!123&115@roads!123&115@
-rou|4|route!106&315@route!107&315@route!130&315@routePlanner!114&131@
+rou|4|routePlanner!115&131@route!106&315@route!107&315@route!130&315@
 run|1|run!59&138@
 set|8|setPackageManager!51&314@setCurrentlyLocatedIn!89&274@setCurrentLocation!84&130@setStrategy!70&98@setCurrentLocation!51&314@setRoute!51&314@setNextRoad!51&314@setStrategy!68&58@
-sta|2|static!50&346@startBuilding!104&275@
+sta|2|startBuilding!104&275@static!50&346@
 ste|1|steepness!112&91@
-sto|12|stop!84&130@stop!73&194@stop!76&18@stop!88&330@stop!62&26@stop!60&298@stop!66&250@stop!81&178@stop!57&266@stop!54&186@stop!61&370@stop!70&98@
-str|6|strategy!124&99@strategy!131&99@strength!110&51@strength!111&379@strategy!120&59@strategy!132&59@
+sto|12|stop!84&130@stop!73&194@stop!76&18@stop!88&330@stop!62&26@stop!60&298@stop!66&250@stop!81&186@stop!57&266@stop!54&178@stop!61&370@stop!70&98@
+str|6|strategy!124&99@strategy!131&99@strength!110&51@strategy!118&59@strategy!132&59@strength!111&379@
 swi|4|switchThresholdsDown!108&139@switchThresholdsUp!133&219@switchThresholdsDown!133&219@switchThresholdsUp!108&139@
 tes|2|testA!52&347@testB!52&347@
-thr|2|throttle!124&99@throttle!134&19@
-tru|1|trunk!114&131@
+thr|2|throttle!134&19@throttle!124&99@
+tru|1|trunk!115&131@
 unl|1|unloadPackage!61&370@
 use|2|usedVolume!67&10@usedVolume!85&354@
 val|1|value!135&347@
-veh|5|vehicle!136&371@vehicles!102&123@vehicle!108&139@vehicle!121&107@vehicle!118&35@
+veh|5|vehicle!120&35@vehicle!136&371@vehicles!102&123@vehicle!108&139@vehicle!119&107@
 vol|1|volume!104&275@
 wea|1|weather!123&115@
 wei|1|weight!104&275@
-whe|1|wheelCircumference!114&131@
-wor|2|world!136&371@world!106&315@
+whe|1|wheelCircumference!115&131@
+wor|2|world!106&315@world!136&371@
 wra|1|wrapper!52&347@
 -- END TREE

@@ -1,12 +1,3 @@
-''' 
-    Lines of Code: 50
-    Max CC2: 5
-    LCOM4: 1
-    TCC:
-    CBO: 4
-    CF:    
-'''
-
 from World.AbstractWorld import AbstractWorld
 
 class World(AbstractWorld):

@@ -46,8 +46,8 @@ class OrOperator(BooleanOperator):
     
 class NotEqualsOperator(BooleanOperator):
     
-    def __init__(self):
-        BooleanOperator.__init__(self, operator.ne, "not")
+    def __init__(self):            
+        BooleanOperator.__init__(self, operator.ne, "!=")
     
 class SubstractionOperator(ArithmeticOperator):
     def __init__(self):
